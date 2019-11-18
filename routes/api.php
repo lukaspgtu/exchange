@@ -27,7 +27,7 @@ Route::post('login', 'Client\AuthController@login')->middleware('assign.guard:us
 Route::post('forgotPassword', 'Client\AuthController@forgotPassword');
 Route::post('redefinePassword', 'Client\AuthController@redefinePassword');
 Route::get('sendConfirmEmail', 'Client\AuthController@sendConfirmEmail');
-Route::post('confirmEmail', 'Client\AuthController@confirmEmail');
+Route::get('activateAccount/{code}', 'Client\AuthController@activateAccount');
 Route::get('mail', 'Client\AuthController@mail');
 
 Route::group(['middleware' => ['auth.jwt', 'assign.guard:users']], function () {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 18-Nov-2019 às 14:15
+-- Tempo de geração: 18-Nov-2019 às 23:02
 -- Versão do servidor: 10.3.16-MariaDB
 -- versão do PHP: 7.3.7
 
@@ -45,6 +45,24 @@ CREATE TABLE `orders` (
 -- --------------------------------------------------------
 
 --
+-- Estrutura da tabela `system`
+--
+
+CREATE TABLE `system` (
+  `id` int(1) NOT NULL,
+  `bitcoin_price` float(10,2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Extraindo dados da tabela `system`
+--
+
+INSERT INTO `system` (`id`, `bitcoin_price`) VALUES
+(1, 34976.88);
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura da tabela `users`
 --
 
@@ -56,12 +74,20 @@ CREATE TABLE `users` (
   `document_number` varchar(18) NOT NULL,
   `document_date` date NOT NULL,
   `password` varchar(255) NOT NULL,
+  `code` int(11) DEFAULT NULL,
   `2fa_key` varchar(40) DEFAULT NULL,
   `2fa_status` varchar(8) NOT NULL,
   `email_status` varchar(11) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Extraindo dados da tabela `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `account_type`, `document_number`, `document_date`, `password`, `code`, `2fa_key`, `2fa_status`, `email_status`, `created_at`, `updated_at`) VALUES
+(1, 'Lucas Moraes Campos', 'lukaspgtu@hotmail.com', 'fisical', '051.507.811-50', '1996-10-11', '$2y$10$aJv93HJqjbmaR0XqosubIe/1OubKQI8b0xE926WrA/n1ILklP2A5C', 520672511, NULL, 'disable', 'confirmed', '2019-11-18 17:23:12', '2019-11-18 17:30:29');
 
 --
 -- Índices para tabelas despejadas
@@ -71,6 +97,12 @@ CREATE TABLE `users` (
 -- Índices para tabela `orders`
 --
 ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices para tabela `system`
+--
+ALTER TABLE `system`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -93,7 +125,7 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

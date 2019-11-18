@@ -25,6 +25,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $attributes = [
+        '2fa_status' => 'disable',
         'email_status' => 'unconfirmed'
     ];
 
@@ -55,5 +56,14 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function generateCode()
+    {
+        $code = sprintf("%06d", mt_rand(1, 999999999));
+
+        $this->code = substr($code, strlen($this->id)) . $this->id;
+
+        $this->save();
     }
 }

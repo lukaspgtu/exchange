@@ -23,4 +23,9 @@ class Order extends Model
     protected $attributes = [
         'status' => 'waiting'
     ];
+
+    public function position()
+    {
+
+    }
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 18-Nov-2019 às 23:02
+-- Tempo de geração: 19-Nov-2019 às 23:20
 -- Versão do servidor: 10.3.16-MariaDB
 -- versão do PHP: 7.3.7
 
@@ -37,10 +37,23 @@ CREATE TABLE `orders` (
   `fee` float(11,8) NOT NULL,
   `unit_price` float(11,2) NOT NULL,
   `position` int(11) NOT NULL,
+  `bitcoin_price` float(10,2) NOT NULL,
   `status` varchar(10) NOT NULL,
   `created_at` datetime NOT NULL,
   `executed_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Extraindo dados da tabela `orders`
+--
+
+INSERT INTO `orders` (`id`, `id_user`, `category`, `type`, `amount`, `fee`, `unit_price`, `position`, `bitcoin_price`, `status`, `created_at`, `executed_at`) VALUES
+(1, 1, 'buy', 'market', 25.00000000, 0.00000000, 34245.00, 4, 0.00, 'waiting', '2019-11-19 19:36:13', NULL),
+(2, 1, 'buy', 'market', 25.00000000, 0.00000000, 34244.00, 5, 0.00, 'waiting', '2019-11-19 19:36:33', NULL),
+(3, 1, 'buy', 'market', 25.00000000, 0.00000000, 34250.00, 2, 0.00, 'waiting', '2019-11-19 19:36:47', NULL),
+(4, 1, 'buy', 'market', 25.00000000, 0.00000000, 34250.00, 3, 0.00, 'waiting', '2019-11-19 19:37:16', NULL),
+(5, 1, 'buy', 'market', 25.00000000, 0.00000000, 34255.00, 1, 0.00, 'waiting', '2019-11-19 19:43:33', NULL),
+(6, 1, 'buy', 'market', 25.00000000, 0.00000000, 34243.00, 6, 0.00, 'waiting', '2019-11-19 19:44:23', NULL);
 
 -- --------------------------------------------------------
 
@@ -50,15 +63,18 @@ CREATE TABLE `orders` (
 
 CREATE TABLE `system` (
   `id` int(1) NOT NULL,
-  `bitcoin_price` float(10,2) DEFAULT NULL
+  `bitcoin_buy` float(10,2) DEFAULT NULL,
+  `bitcoin_sale` float(10,2) DEFAULT NULL,
+  `fee_buy` float(10,2) DEFAULT NULL,
+  `fee_sale` float(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Extraindo dados da tabela `system`
 --
 
-INSERT INTO `system` (`id`, `bitcoin_price`) VALUES
-(1, 34976.88);
+INSERT INTO `system` (`id`, `bitcoin_buy`, `bitcoin_sale`, `fee_buy`, `fee_sale`) VALUES
+(1, 34245.00, 34092.88, 0.50, 1.00);
 
 -- --------------------------------------------------------
 
@@ -87,7 +103,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `account_type`, `document_number`, `document_date`, `password`, `code`, `2fa_key`, `2fa_status`, `email_status`, `created_at`, `updated_at`) VALUES
-(1, 'Lucas Moraes Campos', 'lukaspgtu@hotmail.com', 'fisical', '051.507.811-50', '1996-10-11', '$2y$10$aJv93HJqjbmaR0XqosubIe/1OubKQI8b0xE926WrA/n1ILklP2A5C', 520672511, NULL, 'disable', 'confirmed', '2019-11-18 17:23:12', '2019-11-18 17:30:29');
+(1, 'Lucas Moraes Campos', 'lukaspgtu@hotmail.com', 'fisical', '051.507.811-50', '1996-10-11', '$2y$10$aJv93HJqjbmaR0XqosubIe/1OubKQI8b0xE926WrA/n1ILklP2A5C', 520672511, NULL, 'disabled', 'confirmed', '2019-11-18 17:23:12', '2019-11-18 17:30:29');
 
 --
 -- Índices para tabelas despejadas
@@ -119,7 +135,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de tabela `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de tabela `users`

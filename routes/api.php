@@ -19,26 +19,29 @@ Route::get('/', function () {
 });
 
 # Auth
-Route::get('allPlans', 'Client\PlanController@allPlans');
-Route::get('validateManager/{manager}', 'Client\AuthController@validateManager');
-Route::get('validateUsername/{username}', 'Client\AuthController@validateUsername');
-Route::post('register', 'Client\AuthController@register');
-Route::post('login', 'Client\AuthController@login')->middleware('assign.guard:users');
-Route::post('forgotPassword', 'Client\AuthController@forgotPassword');
-Route::post('redefinePassword', 'Client\AuthController@redefinePassword');
-Route::get('sendConfirmEmail', 'Client\AuthController@sendConfirmEmail');
-Route::get('activateAccount/{code}', 'Client\AuthController@activateAccount');
-Route::get('mail', 'Client\AuthController@mail');
+Route::post('verifyEmail', 'User\AuthController@verifyEmail');
+Route::post('verifyDocumentNumber', 'User\AuthController@verifyDocumentNumber');
+Route::post('register', 'User\AuthController@register');
+Route::post('login', 'User\AuthController@login')->middleware('assign.guard:users');
+Route::post('forgotPassword', 'User\AuthController@forgotPassword');
+Route::post('redefinePassword', 'User\AuthController@redefinePassword');
+Route::get('sendConfirmEmail', 'User\AuthController@sendConfirmEmail');
+Route::get('activateAccount/{code}', 'User\AuthController@activateAccount');
 
 Route::group(['middleware' => ['auth.jwt', 'assign.guard:users']], function () {
 
     # Auth
-    Route::get('logout', 'Client\AuthController@logout');
-    Route::get('auth', 'Client\AuthController@auth');
+    Route::get('logout', 'User\AuthController@logout');
+    Route::get('auth', 'User\AuthController@auth');
 
     # Google2FA
-    Route::get('googleAuth', 'Client\Google2FAController@googleAuth');
-    Route::post('verifyGoogleAuth', 'Client\Google2FAController@verifyGoogleAuth');
-    Route::post('disableGoogleAuth', 'Client\Google2FAController@disableGoogleAuth');
+    Route::get('googleAuth', 'User\Google2FAController@googleAuth');
+    Route::post('verifyGoogleAuth', 'User\Google2FAController@verifyGoogleAuth');
+    Route::post('disableGoogleAuth', 'User\Google2FAController@disableGoogleAuth');
+
+    # Order
+    Route::post('simulateBuy', 'User\OrderController@simulateBuy');
+    Route::post('buy', 'User\OrderController@buy');
+
 
 });

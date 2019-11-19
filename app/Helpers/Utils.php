@@ -48,15 +48,13 @@ if (!function_exists('formatDate')) {
 // 	}
 // }
 
-// if (!function_exists('value_to_percentage')) {
+if (!function_exists('fee')) {
 
-//     function value_to_percentage($value, $base)
-//     {
-//         $value = ($value * 100) / $base;
-
-//         return round($value);
-//     }
-// }
+    function fee($value, $fee, $decimal = 2)
+    {
+        return round(($value * $fee) / 100, $decimal);
+    }
+}
 
 // if (!function_exists('percentage_to_value')) {
 
@@ -73,6 +71,14 @@ if (!function_exists('formatDate')) {
 //         return round($value, 2);
 //     }
 // }
+
+if (!function_exists('formatBitcoin')) {
+
+    function formatBitcoin($value)
+    {
+        return round($value, 8);
+    }
+}
 
 if(!function_exists('validateCNPJ'))
 {

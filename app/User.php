@@ -25,7 +25,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $attributes = [
-        '2fa_status' => 'disable',
+        '2fa_status' => 'disabled',
         'email_status' => 'unconfirmed'
     ];
 

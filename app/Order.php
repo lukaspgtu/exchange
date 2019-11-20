@@ -15,7 +15,7 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
-        'id_user', 'category', 'type', 'amount', 'fee', 'unit_price', 'position', '$bitcoin_price'
+        'id_user', 'category', 'type', 'amount', 'fee', 'unit_price', 'position', 'total_value'
     ];
 
     /**
@@ -50,6 +50,27 @@ class Order extends Model
         $this->where('category', $this->category)
             ->where('position', '>=', $this->position)
             ->where('id', '<>', $this->id)
+            ->where('status', 'waiting')
             ->increment('position', 1);
     }
+
+    public function process_queue()
+    {
+        $orders = DB::table('orders')
+            ->where('category', '<>', $this->category)
+            ->where('status', 'waiting')
+            ->where('unit_price', '<=', $this->unit_price)
+            ->orderBy('position', 'ASC')
+            ->get();
+
+        // dd($orders);
+
+        // foreach ($orders as $order) {
+
+            // if ($order->)
+
+        // }
+
+    }
+
 }

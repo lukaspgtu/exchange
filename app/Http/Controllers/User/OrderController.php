@@ -8,6 +8,7 @@ use App\Order;
 use App\Rules\OrderType;
 use App\Rules\OrderPrice;
 use App\Rules\OrderAmount;
+use App\Rules\OrderValue;
 use App\System;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,16 +18,14 @@ class OrderController extends Controller
     {
         $request->validate([
             'id_user' => 'required',
+            'value' => ['required', new OrderValue],
             'type' => ['required', new OrderType],
-            'amount' => ['required', new OrderAmount],
             'unit_price' => ['required', new OrderPrice]
         ]);
 
-        $bitcoin_price = System::bitcoinBuy();
+        $amount = toBTC($request->value, $request->unit_price, true);
 
-        $total = formatBitcoin($request->amount / $bitcoin_price);
-
-        $fee = fee($total, System::feeBuy(), 8);
+        $fee = fee($amount, System::feeBuy(), 0);
 
         $position = Order::positionBuy($request->unit_price);
 
@@ -34,26 +33,61 @@ class OrderController extends Controller
             'id_user' => Auth::id(),
             'category' => 'buy',
             'type' => $request->type,
-            'amount' => $request->amount,
-            'fee' => fee($total, $fee, 8),
+            'amount' => $amount,
+            'fee' => $fee,
             'unit_price' => $request->unit_price,
-            'position' => $position,
-            'bitcoin_price' => $bitcoin_price
+            'total_value' => $request->value,
+            'position' => $position
         ]);
 
         $order->save();
 
         $order->reorder();
 
+        $order->process_queue();
+
         return response()->json([
             'success' => true,
-            'message' => 'Compra realizada com sucesso!'
+            'message' => 'Ordem de compra realizada com sucesso!'
         ]);
     }
 
-    public function sell(Request $request)
+    public function sale(Request $request)
     {
+        $request->validate([
+            'id_user' => 'required',
+            'amount' => ['required', new OrderAmount],
+            'type' => ['required', new OrderType],
+            'unit_price' => ['required', new OrderPrice]
+        ]);
 
+        $total_value = toBRL($request->amount, $request->unit_price);
+
+        $fee = fee($total_value, System::feeSale());
+
+        $position = Order::positionSale($request->unit_price);
+
+        $order = new Order([
+            'id_user' => Auth::id(),
+            'category' => 'sale',
+            'type' => $request->type,
+            'amount' => $request->amount,
+            'fee' => $fee,
+            'unit_price' => $request->unit_price,
+            'total_value' => $total_value,
+            'position' => $position
+        ]);
+
+        $order->save();
+
+        $order->reorder();
+
+        $order->process_queue();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ordem de venda realizada com sucesso!'
+        ]);
     }
 
     public function simulateBuy(Request $request)
@@ -66,7 +100,7 @@ class OrderController extends Controller
 
         $bitcoin_price = System::bitcoinBuy();
 
-        $total = formatBitcoin($request->amount / $bitcoin_price);
+        $total = formatBTC($request->amount / $bitcoin_price);
 
         $position = Order::positionBuy($request->unit_price);
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 19-Nov-2019 às 23:20
+-- Tempo de geração: 20-Nov-2019 às 22:47
 -- Versão do servidor: 10.3.16-MariaDB
 -- versão do PHP: 7.3.7
 
@@ -33,11 +33,11 @@ CREATE TABLE `orders` (
   `id_user` bigint(20) NOT NULL,
   `category` varchar(5) NOT NULL,
   `type` varchar(8) NOT NULL,
-  `amount` float(11,8) NOT NULL,
-  `fee` float(11,8) NOT NULL,
+  `amount` int(11) NOT NULL,
+  `fee` float(11,2) NOT NULL,
   `unit_price` float(11,2) NOT NULL,
+  `total_value` float(11,2) NOT NULL,
   `position` int(11) NOT NULL,
-  `bitcoin_price` float(10,2) NOT NULL,
   `status` varchar(10) NOT NULL,
   `created_at` datetime NOT NULL,
   `executed_at` datetime DEFAULT NULL
@@ -47,13 +47,12 @@ CREATE TABLE `orders` (
 -- Extraindo dados da tabela `orders`
 --
 
-INSERT INTO `orders` (`id`, `id_user`, `category`, `type`, `amount`, `fee`, `unit_price`, `position`, `bitcoin_price`, `status`, `created_at`, `executed_at`) VALUES
-(1, 1, 'buy', 'market', 25.00000000, 0.00000000, 34245.00, 4, 0.00, 'waiting', '2019-11-19 19:36:13', NULL),
-(2, 1, 'buy', 'market', 25.00000000, 0.00000000, 34244.00, 5, 0.00, 'waiting', '2019-11-19 19:36:33', NULL),
-(3, 1, 'buy', 'market', 25.00000000, 0.00000000, 34250.00, 2, 0.00, 'waiting', '2019-11-19 19:36:47', NULL),
-(4, 1, 'buy', 'market', 25.00000000, 0.00000000, 34250.00, 3, 0.00, 'waiting', '2019-11-19 19:37:16', NULL),
-(5, 1, 'buy', 'market', 25.00000000, 0.00000000, 34255.00, 1, 0.00, 'waiting', '2019-11-19 19:43:33', NULL),
-(6, 1, 'buy', 'market', 25.00000000, 0.00000000, 34243.00, 6, 0.00, 'waiting', '2019-11-19 19:44:23', NULL);
+INSERT INTO `orders` (`id`, `id_user`, `category`, `type`, `amount`, `fee`, `unit_price`, `total_value`, `position`, `status`, `created_at`, `executed_at`) VALUES
+(1, 1, 'buy', 'limited', 72885, 182.21, 34300.50, 25.00, 1, 'waiting', '2019-11-20 19:21:57', NULL),
+(2, 1, 'buy', 'limited', 72885, 364.43, 34300.50, 25.00, 2, 'waiting', '2019-11-20 19:30:53', NULL),
+(3, 1, 'buy', 'limited', 72885, 364.00, 34300.50, 25.00, 3, 'waiting', '2019-11-20 19:34:24', NULL),
+(4, 1, 'sale', 'limited', 1, 343.01, 34300.50, 34300.50, 1, 'waiting', '2019-11-20 19:38:56', NULL),
+(5, 1, 'sale', 'limited', 1, 0.00, 34300.50, 0.00, 2, 'waiting', '2019-11-20 19:40:38', NULL);
 
 -- --------------------------------------------------------
 
@@ -135,7 +134,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de tabela `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de tabela `users`

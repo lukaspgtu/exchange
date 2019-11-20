@@ -42,6 +42,8 @@ Route::group(['middleware' => ['auth.jwt', 'assign.guard:users']], function () {
     # Order
     Route::post('simulateBuy', 'User\OrderController@simulateBuy');
     Route::post('buy', 'User\OrderController@buy');
+    Route::post('sale', 'User\OrderController@sale');
+
 
 
 });

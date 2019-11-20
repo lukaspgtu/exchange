@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class OrderAmount implements Rule
+class OrderValue implements Rule
 {
     /**
      * Create a new rule instance.
@@ -25,7 +25,7 @@ class OrderAmount implements Rule
      */
     public function passes($attribute, $value)
     {
-        if ($value < 0.00000000)
+        if ($value < 25.00)
             return false;
 
         return true;
@@ -38,6 +38,6 @@ class OrderAmount implements Rule
      */
     public function message()
     {
-        return 'O campo amount deve ser maior ou igual a 0.00000000';
+        return 'O campo value deve ser maior ou igual a 25.00';
     }
 }

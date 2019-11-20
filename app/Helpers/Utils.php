@@ -14,67 +14,50 @@ if (!function_exists('formatDate')) {
     }
 }
 
-// if (!function_exists('current_date')) {
+if (!function_exists('toBRL')) {
 
-//     function current_date($format)
-//     {
-//         date_default_timezone_set('America/Sao_Paulo');
+	function toBRL($amount, $price, $satoshi = false)
+	{
+        if ($satoshi === true)
+            return intval(($amount * pow(10, -8) * $price));
 
-//         return date($format);
-//     }
-// }
+        return round(($amount * $price), 2);
+	}
+}
 
-// if (!function_exists('dollar_to_bitcoin')) {
+if (!function_exists('toBTC')) {
 
-//     function dollar_to_bitcoin($value, $price)
-//     {
-//         return round(($value / $price), 8);
-//     }
-// }
+	function toBTC($value, $price, $satoshi = false)
+	{
+        if ($satoshi === true)
+            return intval(($value / $price) * pow(10, 8));
 
-// if (!function_exists('dollar_to_satoshi')) {
-
-// 	function dollar_to_satoshi($value, $price)
-// 	{
-// 		return round(($value / $price) * pow(10, 8));
-// 	}
-// }
-
-// if (!function_exists('satoshi_to_dollar')) {
-
-// 	function satoshi_to_dollar($satoshi, $price)
-// 	{
-// 		return round(($satoshi * pow(10, -8) * $price), 2);
-// 	}
-// }
+        return round(($value / $price), 8);
+	}
+}
 
 if (!function_exists('fee')) {
 
     function fee($value, $fee, $decimal = 2)
     {
+        if ($decimal == 0)
+            return intval(($value * $fee) / 100, $decimal);
+
         return round(($value * $fee) / 100, $decimal);
     }
 }
 
-// if (!function_exists('percentage_to_value')) {
+if (!function_exists('formatBRL')) {
 
-//     function percentage_to_value($percentage, $base)
-//     {
-//         return round($percentage * ($base / 100), 2);
-//     }
-// }
+    function formatBRL($value)
+    {
+        return round($value, 2);
+    }
+}
 
-// if (!function_exists('format_money')) {
+if (!function_exists('formatBTC')) {
 
-//     function format_money($value)
-//     {
-//         return round($value, 2);
-//     }
-// }
-
-if (!function_exists('formatBitcoin')) {
-
-    function formatBitcoin($value)
+    function formatBTC($value)
     {
         return round($value, 8);
     }

@@ -16,11 +16,8 @@ if (!function_exists('formatDate')) {
 
 if (!function_exists('toBRL')) {
 
-	function toBRL($amount, $price, $satoshi = false)
+	function toBRL($amount, $price)
 	{
-        if ($satoshi === true)
-            return intval(($amount * pow(10, -8) * $price));
-
         return round(($amount * $price), 2);
 	}
 }
@@ -41,7 +38,7 @@ if (!function_exists('fee')) {
     function fee($value, $fee, $decimal = 2)
     {
         if ($decimal == 0)
-            return intval(($value * $fee) / 100, $decimal);
+            return intval(($value * $fee) / 100);
 
         return round(($value * $fee) / 100, $decimal);
     }

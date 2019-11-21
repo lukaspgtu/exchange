@@ -17,15 +17,12 @@ class OrderController extends Controller
     public function buy(Request $request)
     {
         $request->validate([
-            'id_user' => 'required',
-            'value' => ['required', new OrderValue],
+            'amount' => ['required', new OrderValue],
             'type' => ['required', new OrderType],
             'unit_price' => ['required', new OrderPrice]
         ]);
 
-        $amount = toBTC($request->value, $request->unit_price, true);
-
-        $fee = fee($amount, System::feeBuy(), 0);
+        $fee = fee($request->amount, System::feeBuy());
 
         $position = Order::positionBuy($request->unit_price);
 
@@ -33,10 +30,9 @@ class OrderController extends Controller
             'id_user' => Auth::id(),
             'category' => 'buy',
             'type' => $request->type,
-            'amount' => $amount,
+            'amount' => $request->amount,
             'fee' => $fee,
             'unit_price' => $request->unit_price,
-            'total_value' => $request->value,
             'position' => $position
         ]);
 
@@ -55,15 +51,14 @@ class OrderController extends Controller
     public function sale(Request $request)
     {
         $request->validate([
-            'id_user' => 'required',
             'amount' => ['required', new OrderAmount],
             'type' => ['required', new OrderType],
             'unit_price' => ['required', new OrderPrice]
         ]);
 
-        $total_value = toBRL($request->amount, $request->unit_price);
+        $amount = toBRL($request->amount, $request->unit_price);
 
-        $fee = fee($total_value, System::feeSale());
+        $fee = fee($amount, System::feeSale());
 
         $position = Order::positionSale($request->unit_price);
 
@@ -71,10 +66,9 @@ class OrderController extends Controller
             'id_user' => Auth::id(),
             'category' => 'sale',
             'type' => $request->type,
-            'amount' => $request->amount,
+            'amount' => $amount,
             'fee' => $fee,
             'unit_price' => $request->unit_price,
-            'total_value' => $total_value,
             'position' => $position
         ]);
 

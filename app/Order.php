@@ -15,7 +15,7 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
-        'id_user', 'category', 'type', 'amount', 'fee', 'unit_price', 'position'
+        'id_user', 'category', 'type', 'amount', 'fee', 'unit_price', 'processed', 'position'
     ];
 
     /**
@@ -24,13 +24,14 @@ class Order extends Model
      * @var array
      */
     protected $attributes = [
-        'status' => 'waiting'
+        'processed' => 0.00,
+        'status' => 'opened'
     ];
 
     public static function positionBuy($value)
     {
         return DB::table('orders')
-            ->where('status', 'waiting')
+            ->where('status', 'opened')
             ->where('category', 'buy')
             ->where('unit_price', '>=', $value)
             ->count() + 1;
@@ -39,7 +40,7 @@ class Order extends Model
     public static function positionSale($value)
     {
         return DB::table('orders')
-            ->where('status', 'waiting')
+            ->where('status', 'opened')
             ->where('category', 'sale')
             ->where('unit_price', '<=', $value)
             ->count() + 1;
@@ -50,26 +51,38 @@ class Order extends Model
         $this->where('category', $this->category)
             ->where('position', '>=', $this->position)
             ->where('id', '<>', $this->id)
-            ->where('status', 'waiting')
+            ->where('status', 'opened')
             ->increment('position', 1);
     }
 
-    public function process_queue()
+    public function process_buy()
     {
         $orders = DB::table('orders')
-            ->where('category', '<>', $this->category)
-            ->where('status', 'waiting')
+            ->where('category', 'sale')
+            ->where('status', 'opened')
             ->where('unit_price', '<=', $this->unit_price)
             ->orderBy('position', 'ASC')
             ->get();
 
-        // dd($orders);
+        foreach ($orders as $order) {
 
-        // foreach ($orders as $order) {
+            $amount = $order->amount - $order->processed;
 
-            // if ($order->)
+            if ($amount > $this->amount) {
 
-        // }
+                $order->processed += $this->amount;
+
+                $this->processed
+
+            }
+
+            elseif ($amount < $this->amount) {
+
+                $order->processed -= $this->amount;
+
+            }
+
+        }
 
     }
 

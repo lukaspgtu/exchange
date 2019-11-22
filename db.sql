@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 21-Nov-2019 às 21:54
+-- Tempo de geração: 22-Nov-2019 às 22:01
 -- Versão do servidor: 10.3.16-MariaDB
 -- versão do PHP: 7.3.7
 
@@ -36,6 +36,7 @@ CREATE TABLE `orders` (
   `amount` float(11,2) NOT NULL,
   `fee` float(11,2) NOT NULL,
   `unit_price` float(11,2) NOT NULL,
+  `processed` float(11,2) NOT NULL,
   `position` int(11) NOT NULL,
   `status` varchar(10) NOT NULL,
   `created_at` datetime NOT NULL,
@@ -46,13 +47,15 @@ CREATE TABLE `orders` (
 -- Extraindo dados da tabela `orders`
 --
 
-INSERT INTO `orders` (`id`, `id_user`, `category`, `type`, `amount`, `fee`, `unit_price`, `position`, `status`, `created_at`, `executed_at`) VALUES
-(1, 1, 'buy', 'limited', 72885.00, 182.21, 34300.50, 1, 'waiting', '2019-11-20 19:21:57', NULL),
-(2, 1, 'buy', 'limited', 72885.00, 364.43, 34300.50, 2, 'waiting', '2019-11-20 19:30:53', NULL),
-(3, 1, 'buy', 'limited', 72885.00, 364.00, 34300.50, 3, 'waiting', '2019-11-20 19:34:24', NULL),
-(4, 1, 'sale', 'limited', 1.00, 343.01, 34300.50, 1, 'waiting', '2019-11-20 19:38:56', NULL),
-(5, 1, 'sale', 'limited', 1.00, 0.00, 34300.50, 2, 'waiting', '2019-11-20 19:40:38', NULL),
-(6, 1, 'buy', 'limited', 500.00, 2.50, 32450.30, 4, 'waiting', '2019-11-21 15:14:18', NULL);
+INSERT INTO `orders` (`id`, `id_user`, `category`, `type`, `amount`, `fee`, `unit_price`, `processed`, `position`, `status`, `created_at`, `executed_at`) VALUES
+(1, 1, 'buy', 'limited', 500.00, 2.50, 30999.99, 0.00, 3, 'waiting', '2019-11-22 15:56:46', NULL),
+(2, 1, 'buy', 'limited', 500.00, 2.50, 31999.99, 0.00, 1, 'waiting', '2019-11-22 15:59:58', NULL),
+(3, 1, 'buy', 'limited', 500.00, 2.50, 31599.99, 0.00, 2, 'waiting', '2019-11-22 16:00:18', NULL),
+(4, 1, 'buy', 'limited', 500.00, 2.50, 30599.99, 0.00, 4, 'waiting', '2019-11-22 16:01:24', NULL),
+(7, 1, 'sale', 'limited', 30599.99, 153.00, 30599.99, 0.00, 3, 'waiting', '2019-11-22 16:10:20', NULL),
+(8, 1, 'sale', 'limited', 30499.99, 152.50, 30499.99, 0.00, 2, 'waiting', '2019-11-22 16:10:50', NULL),
+(9, 1, 'sale', 'limited', 30999.99, 155.00, 30999.99, 0.00, 4, 'waiting', '2019-11-22 16:11:07', NULL),
+(10, 1, 'sale', 'limited', 29999.99, 150.00, 29999.99, 0.00, 1, 'waiting', '2019-11-22 16:11:49', NULL);
 
 -- --------------------------------------------------------
 
@@ -73,7 +76,7 @@ CREATE TABLE `system` (
 --
 
 INSERT INTO `system` (`id`, `bitcoin_buy`, `bitcoin_sale`, `fee_buy`, `fee_sale`) VALUES
-(1, 34245.00, 34092.88, 0.50, 1.00);
+(1, 34245.00, 34092.88, 0.50, 0.50);
 
 -- --------------------------------------------------------
 
@@ -134,7 +137,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de tabela `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de tabela `users`

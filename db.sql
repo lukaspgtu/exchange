@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 22-Nov-2019 às 22:01
+-- Tempo de geração: 25-Nov-2019 às 23:22
 -- Versão do servidor: 10.3.16-MariaDB
 -- versão do PHP: 7.3.7
 
@@ -21,6 +21,20 @@ SET time_zone = "+00:00";
 --
 -- Banco de dados: `exchange`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `earnings`
+--
+
+CREATE TABLE `earnings` (
+  `id` bigint(20) NOT NULL,
+  `buy_id` bigint(20) NOT NULL,
+  `sale_id` bigint(20) NOT NULL,
+  `value` float(11,2) NOT NULL,
+  `created_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -48,14 +62,12 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `id_user`, `category`, `type`, `amount`, `fee`, `unit_price`, `processed`, `position`, `status`, `created_at`, `executed_at`) VALUES
-(1, 1, 'buy', 'limited', 500.00, 2.50, 30999.99, 0.00, 3, 'waiting', '2019-11-22 15:56:46', NULL),
-(2, 1, 'buy', 'limited', 500.00, 2.50, 31999.99, 0.00, 1, 'waiting', '2019-11-22 15:59:58', NULL),
-(3, 1, 'buy', 'limited', 500.00, 2.50, 31599.99, 0.00, 2, 'waiting', '2019-11-22 16:00:18', NULL),
-(4, 1, 'buy', 'limited', 500.00, 2.50, 30599.99, 0.00, 4, 'waiting', '2019-11-22 16:01:24', NULL),
-(7, 1, 'sale', 'limited', 30599.99, 153.00, 30599.99, 0.00, 3, 'waiting', '2019-11-22 16:10:20', NULL),
-(8, 1, 'sale', 'limited', 30499.99, 152.50, 30499.99, 0.00, 2, 'waiting', '2019-11-22 16:10:50', NULL),
-(9, 1, 'sale', 'limited', 30999.99, 155.00, 30999.99, 0.00, 4, 'waiting', '2019-11-22 16:11:07', NULL),
-(10, 1, 'sale', 'limited', 29999.99, 150.00, 29999.99, 0.00, 1, 'waiting', '2019-11-22 16:11:49', NULL);
+(1, 1, 'sale', 'limited', 25.00, 0.13, 30939.00, 25.00, 1, 'executed', '2019-11-25 20:18:37', '2019-11-25 20:18:58'),
+(2, 1, 'sale', 'limited', 25.00, 0.13, 30939.00, 25.00, 1, 'executed', '2019-11-25 20:18:39', '2019-11-25 20:19:47'),
+(3, 1, 'sale', 'limited', 25.00, 0.13, 30939.00, 25.00, 1, 'executed', '2019-11-25 20:18:40', '2019-11-25 20:19:47'),
+(4, 1, 'sale', 'limited', 25.00, 0.13, 30939.00, 0.00, 1, 'opened', '2019-11-25 20:18:42', NULL),
+(5, 1, 'buy', 'limited', 25.00, 0.13, 30939.00, 25.00, 1, 'executed', '2019-11-25 20:18:58', '2019-11-25 20:18:58'),
+(6, 1, 'buy', 'limited', 50.00, 0.25, 30939.00, 50.00, 1, 'executed', '2019-11-25 20:19:47', '2019-11-25 20:19:47');
 
 -- --------------------------------------------------------
 
@@ -112,6 +124,12 @@ INSERT INTO `users` (`id`, `name`, `email`, `account_type`, `document_number`, `
 --
 
 --
+-- Índices para tabela `earnings`
+--
+ALTER TABLE `earnings`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Índices para tabela `orders`
 --
 ALTER TABLE `orders`
@@ -134,10 +152,16 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT de tabela `earnings`
+--
+ALTER TABLE `earnings`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de tabela `users`

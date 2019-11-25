@@ -48,17 +48,30 @@ class Order extends Model
 
     public function reorder()
     {
-        $this->where('category', $this->category)
-            ->where('position', '>=', $this->position)
-            ->where('id', '<>', $this->id)
-            ->where('status', 'opened')
-            ->increment('position', 1);
+        if ($this->status == 'opened') {
+
+            $this->where('category', $this->category)
+                ->where('position', '>=', $this->position)
+                ->where('id', '<>', $this->id)
+                ->where('status', 'opened')
+                ->increment('position', 1);
+
+        }
+
+        else {
+
+            $this->where('category', $this->category)
+                ->where('position', '>=', $this->position)
+                ->where('id', '<>', $this->id)
+                ->where('status', 'opened')
+                ->decrement('position', 1);
+
+        }
     }
 
     public function process_buy()
     {
-        $orders = DB::table('orders')
-            ->where('category', 'sale')
+        $orders = $this->where('category', 'sale')
             ->where('status', 'opened')
             ->where('unit_price', '<=', $this->unit_price)
             ->orderBy('position', 'ASC')
@@ -66,19 +79,65 @@ class Order extends Model
 
         foreach ($orders as $order) {
 
+            if ($this->status == 'executed') break;
+
             $amount = $order->amount - $order->processed;
 
             if ($amount > $this->amount) {
 
                 $order->processed += $this->amount;
 
-                $this->processed
+                $order->save();
+
+                $this->processed += $this->amount;
+
+                $this->status = 'executed';
+
+                $this->executed_at = date('Y-m-d H:i:s');
+
+                $this->save();
+
+                $this->reorder();
 
             }
 
-            elseif ($amount < $this->amount) {
+            else {
 
-                $order->processed -= $this->amount;
+                $this->processed += $amount;
+
+                $this->save();
+
+                $order->processed += $amount;
+
+                $order->status = 'executed';
+
+                $order->executed_at = date('Y-m-d H:i:s');
+
+                $order->save();
+
+                $order->reorder();
+
+            }
+
+            if ($this->amount == $this->processed) {
+
+                $this->status = 'executed';
+
+                $this->executed_at = date('Y-m-d H:i:s');
+
+                $this->save();
+
+            }
+
+            if ($order->unit_price < $this->unit_price) {
+
+                $gain = new Gain([
+                    'buy_id' => $this->id,
+                    'sale_id' => $order->id,
+                    'value' => $this->amount - $this->processed
+                ]);
+
+                $gain->save();
 
             }
 

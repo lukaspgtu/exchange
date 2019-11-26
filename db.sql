@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 25-Nov-2019 às 23:22
+-- Tempo de geração: 27-Nov-2019 às 00:12
 -- Versão do servidor: 10.3.16-MariaDB
 -- versão do PHP: 7.3.7
 
@@ -47,10 +47,10 @@ CREATE TABLE `orders` (
   `id_user` bigint(20) NOT NULL,
   `category` varchar(5) NOT NULL,
   `type` varchar(8) NOT NULL,
-  `amount` float(11,2) NOT NULL,
-  `fee` float(11,2) NOT NULL,
-  `unit_price` float(11,2) NOT NULL,
-  `processed` float(11,2) NOT NULL,
+  `amount` varchar(40) NOT NULL,
+  `fee` varchar(40) NOT NULL,
+  `unit_price` varchar(40) NOT NULL,
+  `processed` varchar(40) NOT NULL,
   `position` int(11) NOT NULL,
   `status` varchar(10) NOT NULL,
   `created_at` datetime NOT NULL,
@@ -62,12 +62,10 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `id_user`, `category`, `type`, `amount`, `fee`, `unit_price`, `processed`, `position`, `status`, `created_at`, `executed_at`) VALUES
-(1, 1, 'sale', 'limited', 25.00, 0.13, 30939.00, 25.00, 1, 'executed', '2019-11-25 20:18:37', '2019-11-25 20:18:58'),
-(2, 1, 'sale', 'limited', 25.00, 0.13, 30939.00, 25.00, 1, 'executed', '2019-11-25 20:18:39', '2019-11-25 20:19:47'),
-(3, 1, 'sale', 'limited', 25.00, 0.13, 30939.00, 25.00, 1, 'executed', '2019-11-25 20:18:40', '2019-11-25 20:19:47'),
-(4, 1, 'sale', 'limited', 25.00, 0.13, 30939.00, 0.00, 1, 'opened', '2019-11-25 20:18:42', NULL),
-(5, 1, 'buy', 'limited', 25.00, 0.13, 30939.00, 25.00, 1, 'executed', '2019-11-25 20:18:58', '2019-11-25 20:18:58'),
-(6, 1, 'buy', 'limited', 50.00, 0.25, 30939.00, 50.00, 1, 'executed', '2019-11-25 20:19:47', '2019-11-25 20:19:47');
+(1, 1, 'buy', 'limited', '25.00', '0.00000404', '30947.87', '25.00', 0, 'executed', '2019-11-26 17:32:26', '2019-11-26 17:56:17'),
+(8, 1, 'sale', 'limited', '0.00080781', '0.12', '30847.87', '0.00080781', 0, 'executed', '2019-11-26 17:56:17', '2019-11-26 17:56:17'),
+(9, 1, 'sale', 'limited', '0.00080781', '0.12', '30847.87', '0.00080781', 0, 'executed', '2019-11-26 18:12:30', '2019-11-26 18:58:27'),
+(16, 1, 'buy', 'limited', '25', '0.00000404', '30947.87', '25', 0, 'executed', '2019-11-26 18:58:26', '2019-11-26 18:58:26');
 
 -- --------------------------------------------------------
 
@@ -104,7 +102,7 @@ CREATE TABLE `users` (
   `document_number` varchar(18) NOT NULL,
   `document_date` date NOT NULL,
   `password` varchar(255) NOT NULL,
-  `code` int(11) DEFAULT NULL,
+  `code` varchar(40) DEFAULT NULL,
   `2fa_key` varchar(40) DEFAULT NULL,
   `2fa_status` varchar(8) NOT NULL,
   `email_status` varchar(11) NOT NULL,
@@ -117,7 +115,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `account_type`, `document_number`, `document_date`, `password`, `code`, `2fa_key`, `2fa_status`, `email_status`, `created_at`, `updated_at`) VALUES
-(1, 'Lucas Moraes Campos', 'lukaspgtu@hotmail.com', 'fisical', '051.507.811-50', '1996-10-11', '$2y$10$aJv93HJqjbmaR0XqosubIe/1OubKQI8b0xE926WrA/n1ILklP2A5C', 520672511, NULL, 'disabled', 'confirmed', '2019-11-18 17:23:12', '2019-11-18 17:30:29');
+(1, 'Lucas Moraes Campos', 'lukaspgtu@hotmail.com', 'fisical', '051.507.811-50', '1996-10-11', '$2y$10$aJv93HJqjbmaR0XqosubIe/1OubKQI8b0xE926WrA/n1ILklP2A5C', '520672511', NULL, 'disabled', 'confirmed', '2019-11-18 17:23:12', '2019-11-18 17:30:29');
 
 --
 -- Índices para tabelas despejadas
@@ -161,7 +159,7 @@ ALTER TABLE `earnings`
 -- AUTO_INCREMENT de tabela `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de tabela `users`

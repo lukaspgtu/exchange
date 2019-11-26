@@ -249,6 +249,7 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Autenticado com sucesso',
                 'token' => $jwt_token,
+                '2fa_status' => $user['2fa_status']
             ]);
 
         }

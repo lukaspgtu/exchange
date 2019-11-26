@@ -24,23 +24,25 @@ if (!function_exists('toBRL')) {
 
 if (!function_exists('toBTC')) {
 
-	function toBTC($value, $price, $satoshi = false)
+	function toBTC($value, $price)
 	{
-        if ($satoshi === true)
-            return intval(($value / $price) * pow(10, 8));
-
         return round(($value / $price), 8);
 	}
 }
 
-if (!function_exists('fee')) {
+if (!function_exists('feeBRL')) {
 
-    function fee($value, $fee, $decimal = 2)
+    function feeBRL($value, $fee)
     {
-        if ($decimal == 0)
-            return intval(($value * $fee) / 100);
+        return round(($value * $fee) / 100, 2);
+    }
+}
 
-        return round(($value * $fee) / 100, $decimal);
+if (!function_exists('feeBTC')) {
+
+    function feeBTC($value, $fee)
+    {
+        return round(($value * $fee) / 100, 8);
     }
 }
 

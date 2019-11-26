@@ -22,7 +22,7 @@ class OrderController extends Controller
             'unit_price' => ['required', new OrderPrice]
         ]);
 
-        $fee = fee($request->amount, System::feeBuy());
+        $fee = feeBTC(toBTC($request->amount, $request->unit_price), System::feeBuy());
 
         $position = Order::positionBuy($request->unit_price);
 
@@ -40,7 +40,7 @@ class OrderController extends Controller
 
         $order->reorder();
 
-        $order->process();
+        $order->process_buy();
 
         return response()->json([
             'success' => true,
@@ -56,9 +56,7 @@ class OrderController extends Controller
             'unit_price' => ['required', new OrderPrice]
         ]);
 
-        $amount = toBRL($request->amount, $request->unit_price);
-
-        $fee = fee($amount, System::feeSale());
+        $fee = feeBRL(toBRL($request->amount, $request->unit_price), System::feeSale());
 
         $position = Order::positionSale($request->unit_price);
 
@@ -66,7 +64,7 @@ class OrderController extends Controller
             'id_user' => Auth::id(),
             'category' => 'sale',
             'type' => $request->type,
-            'amount' => $amount,
+            'amount' => $request->amount,
             'fee' => $fee,
             'unit_price' => $request->unit_price,
             'position' => $position
@@ -76,7 +74,7 @@ class OrderController extends Controller
 
         $order->reorder();
 
-        $order->process();
+        $order->process_sale();
 
         return response()->json([
             'success' => true,

@@ -28,6 +28,18 @@ class Order extends Model
         'status' => 'opened'
     ];
 
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'amount' => 'float',
+        'fee' => 'float',
+        'unit_price' => 'float',
+        'processed' => 'float'
+    ];
+
     public static function positionBuy($value)
     {
         return DB::table('orders')
@@ -69,27 +81,13 @@ class Order extends Model
         }
     }
 
-    public function process()
+    public function process_buy()
     {
-        if ($this->category == 'buy') {
-
-            $orders = $this->where('category', 'sale')
-                ->where('status', 'opened')
-                ->where('unit_price', '<=', $this->unit_price)
-                ->orderBy('position', 'ASC')
-                ->get();
-
-        }
-
-        else {
-
-            $orders = $this->where('category', 'buy')
-                ->where('status', 'opened')
-                ->where('unit_price', '>=', $this->unit_price)
-                ->orderBy('position', 'ASC')
-                ->get();
-
-        }
+        $orders = $this->where('category', 'sale')
+            ->where('status', 'opened')
+            ->where('unit_price', '<=', $this->unit_price)
+            ->orderBy('position', 'ASC')
+            ->get();
 
         foreach ($orders as $order) {
 
@@ -97,11 +95,95 @@ class Order extends Model
 
             $amount = $order->amount - $order->processed;
 
+            $amount2 = toBTC($this->amount - $this->processed, $this->unit_price);
+
+            if ($amount > $amount2) {
+
+                $this->processed += toBRL($amount, $order->unit_price);
+
+                $this->save();
+
+                $order->processed += $amount;
+
+                $order->position = 0;
+
+                $order->status = 'executed';
+
+                $order->executed_at = date('Y-m-d H:i:s');
+
+                $order->save();
+
+                $order->reorder();
+
+            }
+
+            else {
+
+                $order->processed += $amount2;
+
+                $order->save();
+
+                $this->processed += toBRL($amount2, $this->unit_price);
+
+                $this->position = 0;
+
+                $this->status = 'executed';
+
+                $this->executed_at = date('Y-m-d H:i:s');
+
+                $this->save();
+
+                $this->reorder();
+
+            }
+
+            if ($order->amount == $order->processed) {
+
+                $order->position = 0;
+
+                $order->status = 'executed';
+
+                $order->executed_at = date('Y-m-d H:i:s');
+
+                $order->save();
+
+            }
+
+            // if ($order->unit_price < $this->unit_price) {
+
+            //     $value = $this->unit_price - $order->unit_price;
+
+            //     Gain::create([
+            //         'buy_id' => $this->id,
+            //         'sale_id' => $order->id,
+            //         'value' => $value
+            //     ]);
+
+            // }
+
+        }
+
+    }
+
+    public function process_sale()
+    {
+        $orders = $this->where('category', 'buy')
+            ->where('status', 'opened')
+            ->where('unit_price', '>=', $this->unit_price)
+            ->orderBy('position', 'ASC')
+            ->get();
+
+        foreach ($orders as $order) {
+
+            if ($this->status == 'executed') break;
+
+            $amount = toBTC($order->amount - $order->processed, $order->unit_price);
+
             $amount2 = $this->amount - $this->processed;
 
             if ($amount > $amount2) {
 
-                $order->processed += $amount2;
+                $order->processed += toBRL($amount2, $this->unit_price);
 
                 $order->save();
 
@@ -125,7 +207,7 @@ class Order extends Model
 
                 $this->save();
 
-                $order->processed += $amount;
+                $order->processed += toBRL($amount, $order->unit_price);
 
                 $order->position = 0;
 
@@ -151,17 +233,17 @@ class Order extends Model
 
             }
 
-            if ($order->unit_price < $this->unit_price) {
+            // if ($order->unit_price < $this->unit_price) {
 
-                $value = $this->unit_price - $order->unit_price;
+            //     $value = $this->unit_price - $order->unit_price;
 
-                Gain::create([
-                    'buy_id' => $this->id,
-                    'sale_id' => $order->id,
-                    'value' => $value
-                ]);
+            //     Gain::create([
+            //         'buy_id' => $this->id,
+            //         'sale_id' => $order->id,
+            //         'value' => $value
+            //     ]);
 
-            }
+            // }
 
         }
 

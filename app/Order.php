@@ -69,13 +69,27 @@ class Order extends Model
         }
     }
 
-    public function process_buy()
+    public function process()
     {
-        $orders = $this->where('category', 'sale')
-            ->where('status', 'opened')
-            ->where('unit_price', '<=', $this->unit_price)
-            ->orderBy('position', 'ASC')
-            ->get();
+        if ($this->category == 'buy') {
+
+            $orders = $this->where('category', 'sale')
+                ->where('status', 'opened')
+                ->where('unit_price', '<=', $this->unit_price)
+                ->orderBy('position', 'ASC')
+                ->get();
+
+        }
+
+        else {
+
+            $orders = $this->where('category', 'buy')
+                ->where('status', 'opened')
+                ->where('unit_price', '>=', $this->unit_price)
+                ->orderBy('position', 'ASC')
+                ->get();
+
+        }
 
         foreach ($orders as $order) {
 
@@ -83,13 +97,17 @@ class Order extends Model
 
             $amount = $order->amount - $order->processed;
 
-            if ($amount > $this->amount) {
+            $amount2 = $this->amount - $this->processed;
 
-                $order->processed += $this->amount;
+            if ($amount > $amount2) {
+
+                $order->processed += $amount2;
 
                 $order->save();
 
-                $this->processed += $this->amount;
+                $this->processed += $amount2;
+
+                $this->position = 0;
 
                 $this->status = 'executed';
 
@@ -109,6 +127,8 @@ class Order extends Model
 
                 $order->processed += $amount;
 
+                $order->position = 0;
+
                 $order->status = 'executed';
 
                 $order->executed_at = date('Y-m-d H:i:s');
@@ -121,6 +141,8 @@ class Order extends Model
 
             if ($this->amount == $this->processed) {
 
+                $this->position = 0;
+
                 $this->status = 'executed';
 
                 $this->executed_at = date('Y-m-d H:i:s');
@@ -131,13 +153,13 @@ class Order extends Model
 
             if ($order->unit_price < $this->unit_price) {
 
-                $gain = new Gain([
+                $value = $this->unit_price - $order->unit_price;
+
+                Gain::create([
                     'buy_id' => $this->id,
                     'sale_id' => $order->id,
-                    'value' => $this->amount - $this->processed
+                    'value' => $value
                 ]);
-
-                $gain->save();
 
             }
 

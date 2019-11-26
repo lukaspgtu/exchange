@@ -40,7 +40,7 @@ class OrderController extends Controller
 
         $order->reorder();
 
-        $order->process_buy();
+        $order->process();
 
         return response()->json([
             'success' => true,
@@ -76,7 +76,7 @@ class OrderController extends Controller
 
         $order->reorder();
 
-        // $order->process_queue();
+        $order->process();
 
         return response()->json([
             'success' => true,

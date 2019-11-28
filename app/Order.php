@@ -83,111 +83,27 @@ class Order extends Model
 
     public function process_buy()
     {
-        $orders = $this->where('category', 'sale')
+        $sales = $this->where('category', 'sale')
             ->where('status', 'opened')
             ->where('unit_price', '<=', $this->unit_price)
-            ->orderBy('position', 'ASC')
+            ->orderBy('position', 'asc')
             ->get();
 
-        foreach ($orders as $order) {
+        foreach ($sales as $sale) {
 
             if ($this->status == 'executed') break;
 
-            $amount = $order->amount - $order->processed;
+            $sale_amount = $sale->amount - $sale->processed;
 
-            $amount2 = toBTC($this->amount - $this->processed, $this->unit_price);
+            $buy_amount = toBTC($this->amount - $this->processed, $this->unit_price);
 
-            if ($amount > $amount2) {
+            if ($sale_amount > $buy_amount) {
 
-                $this->processed += toBRL($amount, $order->unit_price);
+                $sale->processed += $buy_amount;
 
-                $this->save();
+                $sale->save();
 
-                $order->processed += $amount;
-
-                $order->position = 0;
-
-                $order->status = 'executed';
-
-                $order->executed_at = date('Y-m-d H:i:s');
-
-                $order->save();
-
-                $order->reorder();
-
-            }
-
-            else {
-
-                $order->processed += $amount2;
-
-                $order->save();
-
-                $this->processed += toBRL($amount2, $this->unit_price);
-
-                $this->position = 0;
-
-                $this->status = 'executed';
-
-                $this->executed_at = date('Y-m-d H:i:s');
-
-                $this->save();
-
-                $this->reorder();
-
-            }
-
-            if ($order->amount == $order->processed) {
-
-                $order->position = 0;
-
-                $order->status = 'executed';
-
-                $order->executed_at = date('Y-m-d H:i:s');
-
-                $order->save();
-
-            }
-
-            // if ($order->unit_price < $this->unit_price) {
-
-            //     $value = $this->unit_price - $order->unit_price;
-
-            //     Gain::create([
-            //         'buy_id' => $this->id,
-            //         'sale_id' => $order->id,
-            //         'value' => $value
-            //     ]);
-
-            // }
-
-        }
-
-    }
-
-    public function process_sale()
-    {
-        $orders = $this->where('category', 'buy')
-            ->where('status', 'opened')
-            ->where('unit_price', '>=', $this->unit_price)
-            ->orderBy('position', 'ASC')
-            ->get();
-
-        foreach ($orders as $order) {
-
-            if ($this->status == 'executed') break;
-
-            $amount = toBTC($order->amount - $order->processed, $order->unit_price);
-
-            $amount2 = $this->amount - $this->processed;
-
-            if ($amount > $amount2) {
-
-                $order->processed += toBRL($amount2, $this->unit_price);
-
-                $order->save();
-
-                $this->processed += $amount2;
+                $this->processed += toBRL($buy_amount, $this->unit_price);
 
                 $this->position = 0;
 
@@ -203,21 +119,21 @@ class Order extends Model
 
             else {
 
-                $this->processed += $amount;
+                $this->processed += toBRL($sale_amount, $this->unit_price);
 
                 $this->save();
 
-                $order->processed += toBRL($amount, $order->unit_price);
+                $sale->processed += $sale_amount;
 
-                $order->position = 0;
+                $sale->position = 0;
 
-                $order->status = 'executed';
+                $sale->status = 'executed';
 
-                $order->executed_at = date('Y-m-d H:i:s');
+                $sale->executed_at = date('Y-m-d H:i:s');
 
-                $order->save();
+                $sale->save();
 
-                $order->reorder();
+                $sale->reorder();
 
             }
 
@@ -233,17 +149,101 @@ class Order extends Model
 
             }
 
-            // if ($order->unit_price < $this->unit_price) {
+            if ($sale->unit_price < $this->unit_price) {
 
-            //     $value = $this->unit_price - $order->unit_price;
+                $value = $this->amount - toBRL($sale->amount, $sale->unit_price);
 
-            //     Gain::create([
-            //         'buy_id' => $this->id,
-            //         'sale_id' => $order->id,
-            //         'value' => $value
-            //     ]);
+                Gain::create([
+                    'buy_id' => $this->id,
+                    'sale_id' => $sale->id,
+                    'value' => $value
+                ]);
 
-            // }
+            }
+
+        }
+
+    }
+
+    public function process_sale()
+    {
+        $buys = $this->where('category', 'buy')
+            ->where('status', 'opened')
+            ->where('unit_price', '>=', $this->unit_price)
+            ->orderBy('position', 'ASC')
+            ->get();
+
+        foreach ($buys as $buy) {
+
+            if ($this->status == 'executed') break;
+
+            $buy_amount = toBTC($buy->amount - $buy->processed, $buy->unit_price);
+
+            $sale_amount = $this->amount - $this->processed;
+
+            if ($buy_amount > $sale_amount) {
+
+                $buy->processed += toBRL($sale_amount, $buy->unit_price);
+
+                $buy->save();
+
+                $this->processed += $sale_amount;
+
+                $this->position = 0;
+
+                $this->status = 'executed';
+
+                $this->executed_at = date('Y-m-d H:i:s');
+
+                $this->save();
+
+                $this->reorder();
+
+            }
+
+            else {
+
+                $this->processed += $buy_amount;
+
+                $this->save();
+
+                $buy->processed += toBRL($buy_amount, $buy->unit_price);
+
+                $buy->position = 0;
+
+                $buy->status = 'executed';
+
+                $buy->executed_at = date('Y-m-d H:i:s');
+
+                $buy->save();
+
+                $buy->reorder();
+
+            }
+
+            if ($this->amount == $this->processed) {
+
+                $this->position = 0;
+
+                $this->status = 'executed';
+
+                $this->executed_at = date('Y-m-d H:i:s');
+
+                $this->save();
+
+            }
+
+            if ($this->unit_price < $buy->unit_price) {
+
+                $value = $buy->amount - toBRL($this->amount, $this->unit_price);
+
+                Gain::create([
+                    'buy_id' => $this->id,
+                    'sale_id' => $buy->id,
+                    'value' => $value
+                ]);
+
+            }
 
         }
 

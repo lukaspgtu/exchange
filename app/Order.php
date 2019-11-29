@@ -17,7 +17,7 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
-        'id_user', 'category', 'type', 'amount', 'fee', 'unit_price', 'processed', 'position'
+        'id_user', 'type', 'amount', 'fee', 'unit_price', 'processed', 'position'
     ];
 
     /**
@@ -46,7 +46,7 @@ class Order extends Model
     {
         return DB::table('orders')
             ->where('status', 'opened')
-            ->where('category', 'buy')
+            ->where('type', 'buy')
             ->where('unit_price', '>=', $value)
             ->count() + 1;
     }
@@ -55,7 +55,7 @@ class Order extends Model
     {
         return DB::table('orders')
             ->where('status', 'opened')
-            ->where('category', 'sale')
+            ->where('type', 'sale')
             ->where('unit_price', '<=', $value)
             ->count() + 1;
     }
@@ -64,7 +64,7 @@ class Order extends Model
     {
         if ($this->status == 'opened') {
 
-            $this->where('category', $this->category)
+            $this->where('type', $this->type)
                 ->where('position', '>=', $this->position)
                 ->where('id', '<>', $this->id)
                 ->where('status', 'opened')
@@ -74,7 +74,7 @@ class Order extends Model
 
         else {
 
-            $this->where('category', $this->category)
+            $this->where('type', $this->type)
                 ->where('position', '>=', $this->position)
                 ->where('id', '<>', $this->id)
                 ->where('status', 'opened')
@@ -85,7 +85,7 @@ class Order extends Model
 
     public function process_buy()
     {
-        $sales = $this->where('category', 'sale')
+        $sales = $this->where('type', 'sale')
             ->where('status', 'opened')
             ->where('unit_price', '<=', $this->unit_price)
             ->orderBy('position', 'asc')
@@ -169,7 +169,7 @@ class Order extends Model
 
     public function process_sale()
     {
-        $buys = $this->where('category', 'buy')
+        $buys = $this->where('type', 'buy')
             ->where('status', 'opened')
             ->where('unit_price', '>=', $this->unit_price)
             ->orderBy('position', 'ASC')

@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 use Location;
 use WSSC\WebSocketClient;
 use \WSSC\Components\ClientConfig;
+use Google2FA;
+use Illuminate\Support\Facades\Redirect;
 
 class AuthController extends Controller
 {
@@ -175,7 +177,8 @@ class AuthController extends Controller
             'account_type' => $request->account_type,
             'document_number' => $request->document_number,
             'document_date' => formatDate($request->document_date, 'Y-m-d'),
-            'password' => bcrypt($request->password)
+            'password' => bcrypt($request->password),
+            'twofactor_key' => Google2FA::generateSecretKey()
         ]);
 
         $user->save();
@@ -222,12 +225,79 @@ class AuthController extends Controller
 
             Session::init($user->id, $request->ip());
 
+            if ($user->twofactor_status == 'disabled') {
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Autenticado com sucesso',
+                    'token' => JWTAuth::fromUser($user)
+                ]);
+
+            }
+
+            else {
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Autenticação dois fatores requerida!',
+                    'twofactor_status' => 'enabled',
+                    'token' => null
+                ]);
+
+            }
+
+        }
+
+        else {
+
             return response()->json([
-                'success' => true,
-                'message' => 'Autenticado com sucesso',
-                'token' => JWTAuth::fromUser($user),
-                '2fa_status' => $user['2fa_status']
+                'success' => false,
+                'message' => 'Senha Incorreta!',
             ]);
+
+        }
+
+    }
+
+    public function loginTwoFactor(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string',
+            'twofactor' => 'required|string'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user === null) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'E-mail não encontrado!',
+            ]);
+
+        }
+
+        if (Hash::check($request->password, $user->password)) {
+
+            if (Google2FA::verifyGoogle2FA($user->twofactor_key, $request->twofactor)) {
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Autenticado com sucesso',
+                    'token' => JWTAuth::fromUser($user)
+                ]);
+
+            }
+
+            else {
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Autenticação dois fatores inválida!',
+                ]);
+
+            }
 
         }
 
@@ -357,20 +427,15 @@ class AuthController extends Controller
 
         if ($user == null) {
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Código inválido!'
-            ]);
+            return abort(404);
+
         }
 
         $user->email_status = 'confirmed';
 
         $user->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Conta ativada com sucesso!'
-        ]);
+        return Redirect::to('http://localhost:8000/home');
 
     }
 

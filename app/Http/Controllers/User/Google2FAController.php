@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Client;
+namespace App\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -9,76 +9,33 @@ use Google2FA;
 
 class Google2FAController extends Controller
 {
-    public function googleAuth()
+    public function qrcode2FA()
     {
         $user = Auth::user();
 
-        if ($user->google_auth_status == ACTIVE) {
+        if ($user->twofactor_status == 'disabled') {
 
-            $secret = $user->google_auth_secret;
+            $qrcode = Google2FA::getQRCodeInline(
+                config('app.name'),
+                $user->email,
+                $user->twofactor_key
+            );
+
+            return response()->json([
+                'success' => true,
+                'qrcode' => $qrcode
+            ]);
 
         }
-        else {
-
-            $secret = Google2FA::generateSecretKey();
-
-        }
-
-        $qrcode = Google2FA::getQRCodeInline(
-            config('app.name'),
-            $user->email,
-            $secret
-        );
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'secret' => $secret,
-                'qrcode' => $qrcode
-            ]
+            'qrcode' => 'enabled'
         ]);
+
     }
 
-    public function verifyGoogleAuth(Request $request)
-    {
-        $request->validate([
-            'secret' => 'required|string',
-            'code' => 'required|string'
-        ]);
-
-        $user = Auth::user();
-
-        if ($user->google_auth_status == ACTIVE) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Google Authenticator já está ativado!'
-            ]);
-
-        }
-
-        if (Google2FA::verifyGoogle2FA($request->secret, $request->code)) {
-
-            $user->google_auth_status = ACTIVE;
-
-            $user->google_auth_secret = $request->secret;
-
-            $user->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Google Authenticator ativado com sucesso!'
-            ]);
-
-        }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Código inválido!'
-        ]);
-    }
-
-    public function disableGoogleAuth(Request $request)
+    public function verify2FA(Request $request)
     {
         $request->validate([
             'code' => 'required|string'
@@ -86,27 +43,26 @@ class Google2FAController extends Controller
 
         $user = Auth::user();
 
-        if ($user->google_auth_status == INACTIVE) {
+        if ($user->twofactor_status == 'enabled') {
 
             return response()->json([
                 'success' => false,
-                'message' => 'Google Authenticator já está desativado!'
+                'message' => 'Autenticação de dois fatores já está ativada!'
             ]);
 
         }
 
-        $status = Google2FA::verifyGoogle2FA($user->google_auth_secret, $request->code);
+        if (Google2FA::verifyGoogle2FA($user->twofactor_key, $request->code)) {
 
-        if ($status) {
-
-            $user->google_auth_status = INACTIVE;
+            $user->twofactor_status = 'enabled';
 
             $user->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Google Authenticator desativado com sucesso!'
+                'message' => 'Autenticação de dois fatores ativada com sucesso!'
             ]);
+
         }
 
         return response()->json([

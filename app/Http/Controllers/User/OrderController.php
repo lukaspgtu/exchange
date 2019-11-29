@@ -5,7 +5,6 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Order;
-use App\Rules\OrderType;
 use App\Rules\OrderPrice;
 use App\Rules\OrderAmount;
 use App\Rules\OrderValue;
@@ -18,7 +17,6 @@ class OrderController extends Controller
     {
         $request->validate([
             'amount' => ['required', new OrderValue],
-            'type' => ['required', new OrderType],
             'unit_price' => ['required', new OrderPrice]
         ]);
 
@@ -28,8 +26,7 @@ class OrderController extends Controller
 
         $order = new Order([
             'id_user' => Auth::id(),
-            'category' => 'buy',
-            'type' => $request->type,
+            'type' => 'buy',
             'amount' => $request->amount,
             'fee' => $fee,
             'unit_price' => $request->unit_price,
@@ -52,7 +49,6 @@ class OrderController extends Controller
     {
         $request->validate([
             'amount' => ['required', new OrderAmount],
-            'type' => ['required', new OrderType],
             'unit_price' => ['required', new OrderPrice]
         ]);
 
@@ -62,8 +58,7 @@ class OrderController extends Controller
 
         $order = new Order([
             'id_user' => Auth::id(),
-            'category' => 'sale',
-            'type' => $request->type,
+            'type' => 'sale',
             'amount' => $request->amount,
             'fee' => $fee,
             'unit_price' => $request->unit_price,
@@ -86,7 +81,6 @@ class OrderController extends Controller
     {
         $request->validate([
             'amount' => 'required',
-            'type' => ['required', new OrderType],
             'unit_price' => 'required'
         ]);
 

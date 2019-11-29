@@ -16,7 +16,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'account_type', 'document_number', 'document_date', 'password'
+        'name', 'email', 'account_type', 'document_number', 'document_date', 'password', 'twofactor_key'
     ];
 
     /**
@@ -25,7 +25,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $attributes = [
-        '2fa_status' => 'disabled',
+        'twofactor_status' => 'disabled',
         'email_status' => 'unconfirmed'
     ];
 
@@ -35,7 +35,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', '2fa_key'
+        'password', 'twofactor_key'
     ];
 
     /**

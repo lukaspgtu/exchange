@@ -169,6 +169,7 @@ return [
         PragmaRX\Google2FALaravel\ServiceProvider::class,
         Stevebauman\Location\LocationServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
+        Jenssegers\Agent\AgentServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -232,6 +233,7 @@ return [
         'Google2FA' => PragmaRX\Google2FALaravel\Facade::class,
         'Location' => Stevebauman\Location\Facades\Location::class,
         'Image' => Intervention\Image\Facades\Image::class,
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
     ],
 
 ];

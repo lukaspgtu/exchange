@@ -5,6 +5,11 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Mail\SendMail;
+use App\Rules\AccountType;
+use App\Rules\CNPJ;
+use App\Rules\CPF;
+use App\Rules\DocumentType;
+use App\Session;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +18,8 @@ use App\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Location;
+use WSSC\WebSocketClient;
+use \WSSC\Components\ClientConfig;
 
 class AuthController extends Controller
 {
@@ -50,7 +57,7 @@ class AuthController extends Controller
     public function verifyDocumentNumber(Request $request)
     {
         $request->validate([
-            'type' => 'required|string',
+            'type' => ['required', new DocumentType],
             'number' => 'required|string'
         ]);
 
@@ -65,7 +72,7 @@ class AuthController extends Controller
 
             }
 
-            if (User::where('cpf', $request->number)->count() > 0) {
+            if (User::where('document_number', $request->number)->count() > 0) {
 
                 return response()->json([
                     'success' => false,
@@ -92,7 +99,7 @@ class AuthController extends Controller
 
             }
 
-            if (User::where('cnpj', $request->number)->count() > 0) {
+            if (User::where('document_number', $request->number)->count() > 0) {
 
                 return response()->json([
                     'success' => false,
@@ -110,10 +117,19 @@ class AuthController extends Controller
 
         else {
 
+            if (User::where('document_number', $request->number)->count() > 0) {
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Passaporte indisponível!'
+                ]);
+
+            }
+
             return response()->json([
-                'status' => false,
-                'error' => 'Document type invalid!'
-            ], 400);
+                'success' => true,
+                'message' => 'Passaporte disponível!'
+            ]);
 
         }
     }
@@ -123,7 +139,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|email|unique:users',
-            'account_type' => 'required|string',
+            'account_type' => ['required', new AccountType],
             'document_number' => 'required|string',
             'document_date' => 'required|string',
             'password' => 'required|string'
@@ -131,67 +147,25 @@ class AuthController extends Controller
 
         if ($request->account_type == 'fisical') {
 
-            if (!validateCPF($request->document_number)) {
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'CPF inválido!'
-                ]);
-
-            }
-
-            if (User::where('document_number', $request->document_number)->count() > 0) {
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'CPF indisponível!'
-                ]);
-
-            }
+            $request->validate([
+                'document_number' => [new CPF, 'unique:users']
+            ]);
 
         }
 
         elseif ($request->account_type == 'legal') {
 
-            if (!validateCNPJ($request->document_number)) {
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'CNPJ inválido!'
-                ]);
-
-            }
-
-            if (User::where('document_number', $request->document_number)->count() > 0) {
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'CNPJ indisponível!'
-                ]);
-
-            }
-
-        }
-
-        elseif ($request->account_type == 'foreign') {
-
-            if (User::where('document_number', $request->document_number)->count() > 0) {
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Passaporte indisponível!'
-                ]);
-
-            }
+            $request->validate([
+                'document_number' => [new CNPJ, 'unique:users']
+            ]);
 
         }
 
         else {
 
-            return response()->json([
-                'status' => false,
-                'error' => 'Account type invalid!'
-            ], 400);
+            $request->validate([
+                'document_number' => 'unique:users'
+            ]);
 
         }
 
@@ -217,9 +191,12 @@ class AuthController extends Controller
 
         Mail::to($user->email)->send(new SendMail('Confirmação de conta', $message));
 
+        Session::init($user->id, $request->ip());
+
         return response()->json([
             'success' => true,
-            'message' => 'Usuário cadastrado com sucesso!'
+            'message' => 'Usuário cadastrado com sucesso!',
+            'token' => JWTAuth::fromUser($user)
         ]);
     }
 
@@ -236,19 +213,19 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Usuário Incorreto!',
+                'message' => 'E-mail não encontrado!',
             ]);
 
         }
 
         if (Hash::check($request->password, $user->password)) {
 
-            $jwt_token = JWTAuth::fromUser($user);
+            Session::init($user->id, $request->ip());
 
             return response()->json([
                 'success' => true,
                 'message' => 'Autenticado com sucesso',
-                'token' => $jwt_token,
+                'token' => JWTAuth::fromUser($user),
                 '2fa_status' => $user['2fa_status']
             ]);
 
@@ -403,7 +380,16 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $user
+            'data' => [
+                'user' => $user
+            ]
         ]);
+    }
+
+    public function socket()
+    {
+        $client = new WebSocketClient('ws://localhost:3000', new ClientConfig());
+        $client->send('{"msg" : 123}');
+        echo $client->receive();
     }
 }

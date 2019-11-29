@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use WSSC\WebSocketClient;
+use \WSSC\Components\ClientConfig;
 
 class Order extends Model
 {
@@ -247,6 +249,12 @@ class Order extends Model
 
         }
 
+    }
+
+    private function sendSocket()
+    {
+        $client = new WebSocketClient('ws://localhost:3000', new ClientConfig());
+        $client->send(json_encode($this));
     }
 
 }

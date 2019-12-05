@@ -25,6 +25,11 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $attributes = [
+        'balance_BTC' => 0,
+        'balance_use_BTC' => 0,
+        'balance_BRL' => 0.00,
+        'balance_use_BRL' => 0.00,
+        'operational_limit' => 1,
         'twofactor_status' => 'disabled',
         'email_status' => 'unconfirmed'
     ];

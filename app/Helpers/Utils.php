@@ -14,51 +14,59 @@ if (!function_exists('formatDate')) {
     }
 }
 
-if (!function_exists('toBRL')) {
+if (!function_exists('satoshi_to_real')) {
 
-	function toBRL($amount, $price)
-	{
-        return round(($amount * $price), 2);
-	}
-}
-
-if (!function_exists('toBTC')) {
-
-	function toBTC($value, $price)
-	{
-        return round(($value / $price), 8);
-	}
-}
-
-if (!function_exists('feeBRL')) {
-
-    function feeBRL($value, $fee)
+    function satoshi_to_real($satoshi, $price)
     {
-        return round(($value * $fee) / 100, 2);
+        return round(($satoshi / pow(10,8)) * $price, 2);
     }
 }
 
-if (!function_exists('feeBTC')) {
+if (!function_exists('real_to_satoshi')) {
 
-    function feeBTC($value, $fee)
+    function real_to_satoshi($real, $price)
     {
-        return round(($value * $fee) / 100, 8);
+        return intval(($real / $price) * pow(10,8));
     }
 }
 
-if (!function_exists('formatBRL')) {
+if (!function_exists('satoshi_to_bitcoin')) {
 
-    function formatBRL($value)
+    function satoshi_to_bitcoin($satoshi)
+    {
+        return round($satoshi / pow(10,8), 8);
+    }
+}
+
+if (!function_exists('bitcoin_to_satoshi')) {
+
+    function bitcoin_to_satoshi($bitcoin)
+    {
+        return intval($bitcoin * pow(10,8));
+    }
+}
+
+if (!function_exists('formatSatoshi')) {
+
+    function formatSatoshi($value)
+    {
+        return intval($value);
+    }
+}
+
+if (!function_exists('formatReal')) {
+
+    function formatReal($value)
     {
         return round($value, 2);
     }
 }
 
-if (!function_exists('formatBTC')) {
+if (!function_exists('fee')) {
 
-    function formatBTC($value)
+    function fee($value, $percent)
     {
-        return round($value, 8);
+        return ($value * $percent) / 100;
     }
 }
 

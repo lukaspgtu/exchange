@@ -20,24 +20,35 @@ class OrderController extends Controller
             'unit_price' => ['required', new OrderPrice]
         ]);
 
-        $fee = feeBTC(toBTC($request->amount, $request->unit_price), System::feeBuy());
+        $user = Auth::user();
 
-        $position = Order::positionBuy($request->unit_price);
+        if ($user->balance_BRL < $request->amount) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Saldo insuficiente!'
+            ]);
+
+        }
 
         $order = new Order([
-            'id_user' => Auth::id(),
+            'user_id' => $user->id,
             'type' => 'buy',
             'amount' => $request->amount,
-            'fee' => $fee,
-            'unit_price' => $request->unit_price,
-            'position' => $position
+            'unit_price' => $request->unit_price
         ]);
+
+        $order->tax();
+
+        $order->order();
 
         $order->save();
 
+        $order->updateUserBalances();
+
         $order->reorder();
 
-        $order->process_buy();
+        $order->processBuy();
 
         return response()->json([
             'success' => true,
@@ -52,24 +63,35 @@ class OrderController extends Controller
             'unit_price' => ['required', new OrderPrice]
         ]);
 
-        $fee = feeBRL(toBRL($request->amount, $request->unit_price), System::feeSale());
+        $user = Auth::user();
 
-        $position = Order::positionSale($request->unit_price);
+        if ($user->balance_BTC < $request->amount) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Saldo insuficiente!'
+            ]);
+
+        }
 
         $order = new Order([
-            'id_user' => Auth::id(),
+            'user_id' => $user->id,
             'type' => 'sale',
-            'amount' => $request->amount,
-            'fee' => $fee,
-            'unit_price' => $request->unit_price,
-            'position' => $position
+            'amount' => bitcoin_to_satoshi($request->amount),
+            'unit_price' => $request->unit_price
         ]);
+
+        $order->tax();
+
+        $order->order();
 
         $order->save();
 
+        $order->updateUserBalances();
+
         $order->reorder();
 
-        $order->process_sale();
+        $order->processSale();
 
         return response()->json([
             'success' => true,
@@ -79,27 +101,27 @@ class OrderController extends Controller
 
     public function simulateBuy(Request $request)
     {
-        $request->validate([
-            'amount' => 'required',
-            'unit_price' => 'required'
-        ]);
+        // $request->validate([
+        //     'amount' => 'required',
+        //     'unit_price' => 'required'
+        // ]);
 
-        $bitcoin_price = System::bitcoinBuy();
+        // $bitcoin_price = System::bitcoinBuy();
 
-        $total = formatBTC($request->amount / $bitcoin_price);
+        // $total = formatBTC($request->amount / $bitcoin_price);
 
-        $position = Order::positionBuy($request->unit_price);
+        // $position = Order::positionBuy($request->unit_price);
 
-        $fee = fee($total, System::feeBuy(), 8);
+        // $fee = fee($total, System::feeBuy(), 8);
 
-        return response()->json([
-            'status' => true,
-            'data' => [
-                'total' => $total,
-                'position' => $position,
-                'fee' => $fee
-            ]
-        ]);
+        // return response()->json([
+        //     'status' => true,
+        //     'data' => [
+        //         'total' => $total,
+        //         'position' => $position,
+        //         'fee' => $fee
+        //     ]
+        // ]);
     }
 
     public function simulateSale()

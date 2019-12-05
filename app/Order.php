@@ -17,7 +17,7 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
-        'id_user', 'type', 'amount', 'fee', 'unit_price', 'processed', 'position'
+        'user_id', 'type', 'amount', 'fee', 'unit_price', 'processed', 'position'
     ];
 
     /**
@@ -42,22 +42,55 @@ class Order extends Model
         'processed' => 'float'
     ];
 
-    public static function positionBuy($value)
-    {
-        return DB::table('orders')
-            ->where('status', 'opened')
-            ->where('type', 'buy')
-            ->where('unit_price', '>=', $value)
-            ->count() + 1;
+    public function getAmount() {
+
+        if ($this->type == 'sale')
+            return satoshi_to_bitcoin($this->amount);
+
+        return $this->amount;
+
     }
 
-    public static function positionSale($value)
+    public function tax()
     {
-        return DB::table('orders')
-            ->where('status', 'opened')
-            ->where('type', 'sale')
-            ->where('unit_price', '<=', $value)
-            ->count() + 1;
+        if ($this->type == 'buy') {
+
+            $value = real_to_satoshi($this->amount, $this->unit_price);
+
+            $this->fee = formatSatoshi(fee($value, System::feeSale()));
+
+        }
+
+        else {
+
+            $value = satoshi_to_real($this->amount, $this->unit_price);
+
+            $this->fee = formatReal(fee($value, System::feeSale()));
+
+        }
+    }
+
+    public function order()
+    {
+        if ($this->type == 'buy') {
+
+            $this->position = DB::table('orders')
+                ->where('status', 'opened')
+                ->where('type', 'buy')
+                ->where('unit_price', '>=', $this->amount)
+                ->count() + 1;
+
+        }
+
+        else {
+
+            $this->position = DB::table('orders')
+                ->where('status', 'opened')
+                ->where('type', 'sale')
+                ->where('unit_price', '<=', $this->amount)
+                ->count() + 1;
+
+        }
     }
 
     public function reorder()
@@ -83,7 +116,96 @@ class Order extends Model
         }
     }
 
-    public function process_buy()
+    public function updateUserBalances()
+    {
+        $user = User::find($this->user_id);
+
+        if ($this->type == 'buy') {
+
+            $user->balance_BRL -= $this->amount;
+
+            $user->balance_use_BRL += $this->amount;
+
+        }
+
+        else {
+
+            $user->balance_BTC -= $this->amount;
+
+            $user->balance_use_BTC += $this->amount;
+
+        }
+
+        $user->save();
+    }
+
+    private function execute()
+    {
+        $this->position = 0;
+
+        $this->status = 'executed';
+
+        $this->executed_at = date('Y-m-d H:i:s');
+
+        $user = User::find($this->user_id);
+
+        if ($this->type == 'buy') {
+
+            $user->balance_BTC += real_to_satoshi($this->amount, $this->unit_price) - $this->fee;
+
+            $user->balance_use_BRL -= $this->amount;
+
+        }
+
+        else {
+
+            $user->balance_BRL += satoshi_to_real($this->amount, $this->unit_price) - $this->fee;
+
+            $user->balance_use_BTC -= $this->amount;
+
+        }
+
+        $user->save();
+
+        $this->save();
+    }
+
+    private function generateExtract()
+    {
+        if ($this->type == 'buy') {
+
+            $value = real_to_satoshi($this->amount, $this->unit_price);
+
+            $type = 'buy';
+
+            $fee_type = 'buy_fee';
+
+        }
+
+        else {
+
+            $value = satoshi_to_real($this->amount, $this->unit_price);
+
+            $type = 'sale';
+
+            $fee_type = 'sale_fee';
+
+        }
+
+        Extract::create([
+            'reference_id' => $this->id,
+            'type' => $type,
+            'value' => $value
+        ]);
+
+        Extract::create([
+            'reference_id' => $this->id,
+            'type' => $fee_type,
+            'value' => $this->fee
+        ]);
+    }
+
+    public function processBuy()
     {
         $sales = $this->where('type', 'sale')
             ->where('status', 'opened')
@@ -97,7 +219,7 @@ class Order extends Model
 
             $sale_amount = $sale->amount - $sale->processed;
 
-            $buy_amount = toBTC($this->amount - $this->processed, $this->unit_price);
+            $buy_amount = real_to_satoshi($this->amount - $this->processed, $this->unit_price);
 
             if ($sale_amount > $buy_amount) {
 
@@ -105,61 +227,65 @@ class Order extends Model
 
                 $sale->save();
 
-                $this->processed += toBRL($buy_amount, $this->unit_price);
+                $this->processed += satoshi_to_real($buy_amount, $this->unit_price);
 
-                $this->position = 0;
-
-                $this->status = 'executed';
-
-                $this->executed_at = date('Y-m-d H:i:s');
-
-                $this->save();
+                $this->execute();
 
                 $this->reorder();
+
+                $this->generateExtract();
+
+                if ($sale->amount == $sale->processed) {
+
+                    $sale->execute();
+
+                    $sale->reorder();
+
+                    $sale->generateExtract();
+
+                }
 
             }
 
             else {
 
-                $this->processed += toBRL($sale_amount, $this->unit_price);
+                $this->processed += satoshi_to_real($sale_amount, $this->unit_price);
 
                 $this->save();
 
                 $sale->processed += $sale_amount;
 
-                $sale->position = 0;
-
-                $sale->status = 'executed';
-
-                $sale->executed_at = date('Y-m-d H:i:s');
-
-                $sale->save();
+                $sale->execute();
 
                 $sale->reorder();
 
-            }
+                $sale->generateExtract();
 
-            if ($this->amount == $this->processed) {
+                if ($this->amount == $this->processed) {
 
-                $this->position = 0;
+                    $this->execute();
 
-                $this->status = 'executed';
+                    $this->reorder();
 
-                $this->executed_at = date('Y-m-d H:i:s');
+                    $this->generateExtract();
 
-                $this->save();
+                }
 
             }
 
             if ($sale->unit_price < $this->unit_price) {
 
-                $value = $this->amount - toBRL($sale->amount, $sale->unit_price);
+                $value = satoshi_to_real($sale->amount, $this->unit_price) - satoshi_to_real($sale->amount, $sale->unit_price);
 
-                Gain::create([
-                    'buy_id' => $this->id,
-                    'sale_id' => $sale->id,
-                    'value' => $value
-                ]);
+                if ($value > 0) {
+
+                    Gain::create([
+                        'buy_id' => $this->id,
+                        'sale_id' => $sale->id,
+                        'value' => $value
+                    ]);
+
+                }
 
             }
 
@@ -167,7 +293,7 @@ class Order extends Model
 
     }
 
-    public function process_sale()
+    public function processSale()
     {
         $buys = $this->where('type', 'buy')
             ->where('status', 'opened')
@@ -179,27 +305,33 @@ class Order extends Model
 
             if ($this->status == 'executed') break;
 
-            $buy_amount = toBTC($buy->amount - $buy->processed, $buy->unit_price);
+            $buy_amount = real_to_satoshi($buy->amount - $buy->processed, $buy->unit_price);
 
             $sale_amount = $this->amount - $this->processed;
 
             if ($buy_amount > $sale_amount) {
 
-                $buy->processed += toBRL($sale_amount, $buy->unit_price);
+                $buy->processed += satoshi_to_real($sale_amount, $buy->unit_price);
 
                 $buy->save();
 
                 $this->processed += $sale_amount;
 
-                $this->position = 0;
-
-                $this->status = 'executed';
-
-                $this->executed_at = date('Y-m-d H:i:s');
-
-                $this->save();
+                $this->execute();
 
                 $this->reorder();
+
+                $this->generateExtract();
+
+                if ($buy->amount == $buy->processed) {
+
+                    $buy->execute();
+
+                    $buy->reorder();
+
+                    $buy->generateExtract();
+
+                }
 
             }
 
@@ -209,41 +341,39 @@ class Order extends Model
 
                 $this->save();
 
-                $buy->processed += toBRL($buy_amount, $buy->unit_price);
+                $buy->processed += satoshi_to_real($buy_amount, $buy->unit_price);
 
-                $buy->position = 0;
-
-                $buy->status = 'executed';
-
-                $buy->executed_at = date('Y-m-d H:i:s');
-
-                $buy->save();
+                $buy->execute();
 
                 $buy->reorder();
 
-            }
+                $buy->generateExtract();
 
-            if ($this->amount == $this->processed) {
+                if ($this->amount == $this->processed) {
 
-                $this->position = 0;
+                    $this->execute();
 
-                $this->status = 'executed';
+                    $this->reorder();
 
-                $this->executed_at = date('Y-m-d H:i:s');
+                    $this->generateExtract();
 
-                $this->save();
+                }
 
             }
 
             if ($this->unit_price < $buy->unit_price) {
 
-                $value = $buy->amount - toBRL($this->amount, $this->unit_price);
+                $value = satoshi_to_real($this->amount, $buy->unit_price) - satoshi_to_real($this->amount, $this->unit_price);
 
-                Gain::create([
-                    'buy_id' => $this->id,
-                    'sale_id' => $buy->id,
-                    'value' => $value
-                ]);
+                if ($value > 0) {
+
+                    Gain::create([
+                        'buy_id' => $this->id,
+                        'sale_id' => $buy->id,
+                        'value' => $value
+                    ]);
+
+                }
 
             }
 

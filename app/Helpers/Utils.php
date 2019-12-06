@@ -62,6 +62,14 @@ if (!function_exists('formatReal')) {
     }
 }
 
+if (!function_exists('formatBitcoin')) {
+
+    function formatBitcoin($value)
+    {
+        return round($value, 8);
+    }
+}
+
 if (!function_exists('fee')) {
 
     function fee($value, $percent)

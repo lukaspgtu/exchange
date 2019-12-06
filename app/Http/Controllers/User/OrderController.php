@@ -99,38 +99,127 @@ class OrderController extends Controller
         ]);
     }
 
-    public function simulateBuy(Request $request)
+    public function buyLimitedPrice(Request $request)
     {
-        // $request->validate([
-        //     'amount' => 'required',
-        //     'unit_price' => 'required'
-        // ]);
+        $request->validate([
+            'amount' => 'required',
+            'unit_price' => 'required'
+        ]);
 
-        // $bitcoin_price = System::bitcoinBuy();
+        $order = new Order([
+            'amount' => $request->amount,
+            'unit_price' => $request->unit_price,
+            'type' => 'buy'
+        ]);
 
-        // $total = formatBTC($request->amount / $bitcoin_price);
+        $order->total = $order->amount / $order->unit_price;
 
-        // $position = Order::positionBuy($request->unit_price);
+        $order->tax();
 
-        // $fee = fee($total, System::feeBuy(), 8);
+        $order->order();
 
-        // return response()->json([
-        //     'status' => true,
-        //     'data' => [
-        //         'total' => $total,
-        //         'position' => $position,
-        //         'fee' => $fee
-        //     ]
-        // ]);
+        return response()->json([
+            'total' => formatBitcoin($order->total),
+            'position' => $order->position,
+            'fee' => satoshi_to_bitcoin($order->fee)
+        ]);
     }
 
-    public function simulateSale()
+    public function saleLimitedPrice(Request $request)
     {
+        $request->validate([
+            'amount' => 'required',
+            'unit_price' => 'required'
+        ]);
+
+        $order = new Order([
+            'amount' => $request->amount,
+            'unity_price' => $request->unit_price,
+            'type' => 'sale'
+        ]);
+
+        $order->total = formatReal($order->amount * $order->unit_price);
+
+        $order->tax();
+
+        $order->order();
+
+        return response()->json([
+            'total' => $order->total,
+            'position' => $order->position,
+            'fee' => $order->fee
+        ]);
+    }
+
+    public function buyMarketPrice(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required'
+        ]);
+
+        $firstOrder = Order::where('type', 'buy')
+            ->where('position', 1)
+            ->first();
+
+        if ($firstOrder != null)
+            $unit_price = formatReal($firstOrder->unit_price + 1.00);
+
+        else
+            $unit_price = formatReal(System::bitcoinBuy());
+
+        $order = new Order([
+            'amount' => $request->amount,
+            'unit_price' => $unit_price,
+            'position' => 1,
+            'type' => 'buy'
+        ]);
+
+        $order->total = formatBitcoin($order->amount / $order->unit_price);
+
+        $order->tax();
+
+        return response()->json([
+            'unit_price' => $order->unit_price,
+            'total' => $order->total,
+            'position' => $order->position,
+            'fee' => $order->fee
+        ]);
 
     }
 
-    public function bitcoinPrice()
+    public function saleMarketPrice(Request $request)
     {
+        $request->validate([
+            'amount' => 'required'
+        ]);
+
+        $firstOrder = Order::where('type', 'sale')
+            ->where('position', 1)
+            ->first();
+
+        if ($firstOrder != null)
+            $unit_price = formatReal($firstOrder->unit_price - 1.00);
+
+        else
+            $unit_price = formatReal(System::bitcoinBuy());
+
+        $order = new Order([
+            'amount' => $request->amount,
+            'unit_price' => $unit_price,
+            'position' => 1,
+            'type' => 'sale'
+        ]);
+
+        $order->total = formatReal($order->amount * $order->unit_price);
+
+        $order->tax();
+
+        return response()->json([
+            'unit_price' => $order->unit_price,
+            'total' => $order->total,
+            'position' => $order->position,
+            'fee' => $order->fee
+        ]);
 
     }
 }

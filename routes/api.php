@@ -35,6 +35,10 @@ Route::group(['middleware' => ['auth.jwt', 'assign.guard:users']], function () {
     Route::post('verify2FA', 'User\Google2FAController@verify2FA');
 
     # Order
+    Route::post('buyLimitedPrice', 'User\OrderController@buyLimitedPrice');
+    Route::post('saleLimitedPrice', 'User\OrderController@saleLimitedPrice');
+    Route::post('buyMarketPrice', 'User\OrderController@buyMarketPrice');
+    Route::post('saleMarketPrice', 'User\OrderController@saleMarketPrice');
     Route::post('simulateBuy', 'User\OrderController@simulateBuy');
     Route::post('buy', 'User\OrderController@buy');
     Route::post('sale', 'User\OrderController@sale');

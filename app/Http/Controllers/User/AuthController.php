@@ -453,7 +453,7 @@ class AuthController extends Controller
 
     public function socket()
     {
-        $client = new WebSocketClient('ws://localhost:3000', new ClientConfig());
+        $client = new WebSocketClient('ws://192.168.0.35:3000', new ClientConfig());
         $client->send(json_encode(['order' => 19491]));
         // echo $client->receive();
     }

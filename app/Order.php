@@ -168,6 +168,40 @@ class Order extends Model
         $user->save();
 
         $this->save();
+
+        ################################ WebSocket ###################################
+
+        $buys = DB::table('orders')
+            ->selectRaw('amount, unit_price, format(amount / unit_price, 8) as total')
+            ->where('type', 'buy')
+            ->where('status', 'opened')
+            ->orderBy('position', 'ASC')
+            ->limit(10)
+            ->get();
+
+        $sales = DB::table('orders')
+            ->selectRaw('amount, unit_price, format(amount * unit_price, 2) as total')
+            ->where('type', 'sale')
+            ->where('status', 'opened')
+            ->orderBy('position', 'ASC')
+            ->limit(10)
+            ->get();
+
+        $executeds = DB::table('orders')
+            ->select('executed_at', 'type', 'amount', 'unit_price')
+            ->where('status', 'executed')
+            ->orderBy('executed_at', 'DESC')
+            ->limit(10)
+            ->get();
+
+        $client = new WebSocketClient('ws://192.168.0.35:3000', new ClientConfig());
+
+        $client->send(json_encode([
+            'buys' => $buys,
+            'sales' => $sales,
+            'executeds' => $executeds
+        ]));
+
     }
 
     private function generateExtract()
@@ -380,11 +414,4 @@ class Order extends Model
         }
 
     }
-
-    private function sendSocket()
-    {
-        $client = new WebSocketClient('ws://localhost:3000', new ClientConfig());
-        $client->send(json_encode($this));
-    }
-
 }

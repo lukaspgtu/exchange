@@ -194,13 +194,13 @@ class Order extends Model
             ->limit(10)
             ->get();
 
-        $client = new WebSocketClient('ws://192.168.0.35:3000', new ClientConfig());
+        // $client = new WebSocketClient('ws://192.168.0.35:3000', new ClientConfig());
 
-        $client->send(json_encode([
-            'buys' => $buys,
-            'sales' => $sales,
-            'executeds' => $executeds
-        ]));
+        // $client->send(json_encode([
+        //     'buys' => $buys,
+        //     'sales' => $sales,
+        //     'executeds' => $executeds
+        // ]));
 
     }
 

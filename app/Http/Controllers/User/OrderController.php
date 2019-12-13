@@ -13,6 +13,38 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    public function orders()
+    {
+        $buys = Order::selectRaw('amount, unit_price, cast((amount / unit_price) as double(10,8)) as total')
+            ->where('type', 'buy')
+            ->where('status', 'opened')
+            ->orderBy('position', 'ASC')
+            ->limit(10)
+            ->get();
+
+        $sales = Order::selectRaw('amount, unit_price, cast(((amount / pow(10,8)) * unit_price) as double(10,2)) as total')
+            ->where('type', 'sale')
+            ->where('status', 'opened')
+            ->orderBy('position', 'ASC')
+            ->limit(10)
+            ->get();
+
+        $executeds = Order::selectRaw('executed_at, type, if(type="sale", cast((amount / pow(10,8)) as double(10,8)), amount) as amount, unit_price')
+            ->where('status', 'executed')
+            ->orderBy('executed_at', 'DESC')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'buys' => $buys,
+                'sales' => $sales,
+                'executeds' => $executeds
+            ]
+        ]);
+    }
+
     public function buy(Request $request)
     {
         $request->validate([

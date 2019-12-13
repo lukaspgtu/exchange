@@ -71,4 +71,11 @@ class User extends Authenticatable implements JWTSubject
 
         $this->save();
     }
+
+    public function prepareBalances()
+    {
+        $this->balance_BTC = satoshi_to_bitcoin($this->balance_BTC);
+
+        $this->balance_use_BTC = satoshi_to_bitcoin($this->balance_use_BTC);
+    }
 }

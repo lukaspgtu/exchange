@@ -443,6 +443,8 @@ class AuthController extends Controller
     {
         $user = Auth::user();
 
+        $user->prepareBalances();
+
         return response()->json([
             'success' => true,
             'data' => [

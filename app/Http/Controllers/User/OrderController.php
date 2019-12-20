@@ -13,35 +13,63 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function orders()
+    public function allOrders()
     {
-        $buys = Order::selectRaw('amount, unit_price, cast((amount / unit_price) as double(10,8)) as total')
-            ->where('type', 'buy')
-            ->where('status', 'opened')
-            ->orderBy('position', 'ASC')
-            ->limit(10)
-            ->get();
+        $user = Auth::user();
 
-        $sales = Order::selectRaw('amount, unit_price, cast(((amount / pow(10,8)) * unit_price) as double(10,2)) as total')
-            ->where('type', 'sale')
-            ->where('status', 'opened')
-            ->orderBy('position', 'ASC')
-            ->limit(10)
-            ->get();
-
-        $executeds = Order::selectRaw('executed_at, type, if(type="sale", cast((amount / pow(10,8)) as double(10,8)), amount) as amount, unit_price')
-            ->where('status', 'executed')
-            ->orderBy('executed_at', 'DESC')
-            ->limit(10)
-            ->get();
+        $orders = $user->getOrders();
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'buys' => $buys,
-                'sales' => $sales,
-                'executeds' => $executeds
-            ]
+            'data' => $orders
+        ]);
+    }
+
+    public function ordersCanceled()
+    {
+        $user = Auth::user();
+
+        $orders = $user->getOrdersByStatus(CANCELED);
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders
+        ]);
+    }
+
+    public function ordersExecuted()
+    {
+        $user = Auth::user();
+
+        $orders = $user->getOrdersByStatus(EXECUTED);
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders
+        ]);
+    }
+
+    public function ordersRunning()
+    {
+        $user = Auth::user();
+
+        $orders = $user->getOrdersByStatus(RUNNING);
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders
+        ]);
+    }
+
+    public function ordersWaiting()
+    {
+        $user = Auth::user();
+
+        $orders = $user->getOrdersByStatus(WAITING);
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders
         ]);
     }
 
@@ -166,11 +194,13 @@ class OrderController extends Controller
 
         $order = new Order([
             'amount' => $request->amount,
-            'unity_price' => $request->unit_price,
+            'unit_price' => $request->unit_price,
             'type' => 'sale'
         ]);
 
         $order->total = formatReal($order->amount * $order->unit_price);
+
+        $order->amount = bitcoin_to_satoshi($order->amount);
 
         $order->tax();
 
@@ -206,15 +236,15 @@ class OrderController extends Controller
             'type' => 'buy'
         ]);
 
-        $order->total = formatBitcoin($order->amount / $order->unit_price);
+        $order->total = $order->amount / $order->unit_price;
 
         $order->tax();
 
         return response()->json([
             'unit_price' => $order->unit_price,
-            'total' => $order->total,
+            'total' => formatBitcoin($order->total),
             'position' => $order->position,
-            'fee' => $order->fee
+            'fee' => satoshi_to_bitcoin($order->fee)
         ]);
 
     }
@@ -244,6 +274,8 @@ class OrderController extends Controller
 
         $order->total = formatReal($order->amount * $order->unit_price);
 
+        $order->amount = bitcoin_to_satoshi($order->amount);
+
         $order->tax();
 
         return response()->json([
@@ -253,5 +285,23 @@ class OrderController extends Controller
             'fee' => $order->fee
         ]);
 
+    }
+
+    public function orderStreaming()
+    {
+        $buys = Order::getAllLastBuys();
+
+        $sales = Order::getAllLastSales();
+
+        $executeds = Order::getAllLastExecuteds();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'buys' => $buys,
+                'sales' => $sales,
+                'executeds' => $executeds
+            ]
+        ]);
     }
 }

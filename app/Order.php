@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use WSSC\WebSocketClient;
 use \WSSC\Components\ClientConfig;
 
@@ -42,13 +41,49 @@ class Order extends Model
         'processed' => 'float'
     ];
 
-    public function getAmount() {
+    public static function getAllLastBuys()
+    {
+        $amount = 'cast((amount - processed) as double(11,2)) as amount';
 
-        if ($this->type == 'sale')
-            return satoshi_to_bitcoin($this->amount);
+        $total = 'cast((amount / unit_price) as double(11,8)) as total';
 
-        return $this->amount;
+        $raw = "$amount, unit_price, $total";
 
+        return Order::selectRaw($raw)
+            ->where('type', 'buy')
+            ->where('status', 'opened')
+            ->orderBy('position', 'ASC')
+            ->limit(10)
+            ->get();
+    }
+
+    public static function getAllLastSales()
+    {
+        $amount = 'cast(((amount - processed) / pow(10,8)) as double(11,8)) as amount';
+
+        $total = 'cast(((amount / pow(10,8)) * unit_price) as double(11,2)) as total';
+
+        $raw = "$amount, unit_price, $total";
+
+        return Order::selectRaw($raw)
+            ->where('type', 'sale')
+            ->where('status', 'opened')
+            ->orderBy('position', 'ASC')
+            ->limit(10)
+            ->get();
+    }
+
+    public static function getAllLastExecuteds()
+    {
+        $amount = 'if(type="sale", cast((amount / pow(10,8)) as double(11,8)), amount) as amount';
+
+        $raw = "executed_at, type, $amount, unit_price";
+
+        return Order::selectRaw($raw)
+            ->where('status', 'executed')
+            ->orderBy('executed_at', 'DESC')
+            ->limit(10)
+            ->get();
     }
 
     public function tax()
@@ -74,9 +109,8 @@ class Order extends Model
     {
         if ($this->type == 'buy') {
 
-            $this->position = DB::table('orders')
+            $this->position = Order::where('type', 'buy')
                 ->where('status', 'opened')
-                ->where('type', 'buy')
                 ->where('unit_price', '>=', $this->amount)
                 ->count() + 1;
 
@@ -84,9 +118,8 @@ class Order extends Model
 
         else {
 
-            $this->position = DB::table('orders')
+            $this->position = Order::where('type', 'sale')
                 ->where('status', 'opened')
-                ->where('type', 'sale')
                 ->where('unit_price', '<=', $this->amount)
                 ->count() + 1;
 
@@ -97,7 +130,7 @@ class Order extends Model
     {
         if ($this->status == 'opened') {
 
-            $this->where('type', $this->type)
+            Order::where('type', $this->type)
                 ->where('position', '>=', $this->position)
                 ->where('id', '<>', $this->id)
                 ->where('status', 'opened')
@@ -107,7 +140,7 @@ class Order extends Model
 
         else {
 
-            $this->where('type', $this->type)
+            Order::where('type', $this->type)
                 ->where('position', '>=', $this->position)
                 ->where('id', '<>', $this->id)
                 ->where('status', 'opened')
@@ -118,9 +151,11 @@ class Order extends Model
 
     public function updateUserBalances()
     {
-        $user = User::find($this->user_id);
+        $user = User::select('balance_BRL', 'balance_use_BRL', 'balance_BTC', 'balance_use_BTC')
+            ->where('id', $this->user_id)
+            ->first();
 
-        if ($this->type == 'buy') {
+        if ($this->type == BUY) {
 
             $user->balance_BRL -= $this->amount;
 
@@ -147,9 +182,11 @@ class Order extends Model
 
         $this->executed_at = date('Y-m-d H:i:s');
 
-        $user = User::find($this->user_id);
+        $user = User::select('balance_BRL', 'balance_use_BRL', 'balance_BTC', 'balance_use_BTC')
+            ->where('id', $this->user_id)
+            ->first();
 
-        if ($this->type == 'buy') {
+        if ($this->type == BUY) {
 
             $user->balance_BTC += real_to_satoshi($this->amount, $this->unit_price) - $this->fee;
 
@@ -169,50 +206,23 @@ class Order extends Model
 
         $this->save();
 
-        ################################ WebSocket ###################################
-
-        $buys = DB::table('orders')
-            ->selectRaw('amount, unit_price, format(amount / unit_price, 8) as total')
-            ->where('type', 'buy')
-            ->where('status', 'opened')
-            ->orderBy('position', 'ASC')
-            ->limit(10)
-            ->get();
-
-        $sales = DB::table('orders')
-            ->selectRaw('amount, unit_price, format(amount * unit_price, 2) as total')
-            ->where('type', 'sale')
-            ->where('status', 'opened')
-            ->orderBy('position', 'ASC')
-            ->limit(10)
-            ->get();
-
-        $executeds = DB::table('orders')
-            ->select('executed_at', 'type', 'amount', 'unit_price')
-            ->where('status', 'executed')
-            ->orderBy('executed_at', 'DESC')
-            ->limit(10)
-            ->get();
-
-        // $client = new WebSocketClient('ws://192.168.0.35:3000', new ClientConfig());
-
-        // $client->send(json_encode([
-        //     'buys' => $buys,
-        //     'sales' => $sales,
-        //     'executeds' => $executeds
-        // ]));
+        $this->sendExecuteds();
 
     }
 
     private function generateExtract()
     {
-        if ($this->type == 'buy') {
+        if ($this->type == BUY) {
 
             $value = real_to_satoshi($this->amount, $this->unit_price);
 
-            $type = 'buy';
+            $type = BUY;
 
-            $fee_type = 'buy_fee';
+            $fee_type = BUY_FEE;
+
+            $description = BUY_DESCRIPTION;
+
+            $description_fee = BUY_FEE_DESCRIPTION;
 
         }
 
@@ -220,28 +230,36 @@ class Order extends Model
 
             $value = satoshi_to_real($this->amount, $this->unit_price);
 
-            $type = 'sale';
+            $type = SALE;
 
-            $fee_type = 'sale_fee';
+            $fee_type = SALE_FEE;
+
+            $description = SALE_DESCRIPTION;
+
+            $description_fee = SALE_FEE_DESCRIPTION;
 
         }
 
         Extract::create([
+            'user_id' => $this->user_id,
             'reference_id' => $this->id,
             'type' => $type,
-            'value' => $value
+            'value' => $value,
+            'description' => $description
         ]);
 
         Extract::create([
+            'user_id' => $this->user_id,
             'reference_id' => $this->id,
             'type' => $fee_type,
-            'value' => $this->fee
+            'value' => $this->fee,
+            'description' => $description_fee
         ]);
     }
 
     public function processBuy()
     {
-        $sales = $this->where('type', 'sale')
+        $sales = Order::where('type', 'sale')
             ->where('status', 'opened')
             ->where('unit_price', '<=', $this->unit_price)
             ->orderBy('position', 'asc')
@@ -249,7 +267,7 @@ class Order extends Model
 
         foreach ($sales as $sale) {
 
-            if ($this->status == 'executed') break;
+            if ($this->status == EXECUTED) break;
 
             $sale_amount = $sale->amount - $sale->processed;
 
@@ -325,11 +343,15 @@ class Order extends Model
 
         }
 
+        $this->sendBuys();
+
+        $this->sendSales();
+
     }
 
     public function processSale()
     {
-        $buys = $this->where('type', 'buy')
+        $buys = Order::where('type', 'buy')
             ->where('status', 'opened')
             ->where('unit_price', '>=', $this->unit_price)
             ->orderBy('position', 'ASC')
@@ -337,7 +359,7 @@ class Order extends Model
 
         foreach ($buys as $buy) {
 
-            if ($this->status == 'executed') break;
+            if ($this->status == EXECUTED) break;
 
             $buy_amount = real_to_satoshi($buy->amount - $buy->processed, $buy->unit_price);
 
@@ -413,5 +435,57 @@ class Order extends Model
 
         }
 
+        $this->sendSales();
+
+        $this->sendBuys();
+
+    }
+
+    private function sendBuys()
+    {
+        $buys = $this->getAllLastBuys();
+
+        $ClientConfig = new ClientConfig();
+
+        $ClientConfig->setHeaders(['Authorization' => env('WEB_SOCKET_AUTH')]);
+
+        $client = new WebSocketClient('ws://192.168.0.35:3000', $ClientConfig);
+
+        $client->send(json_encode([
+            'type' => 'buys',
+            'data' => $buys
+        ]));
+    }
+
+    private function sendSales()
+    {
+        $sales = $this->getAllLastSales();
+
+        $ClientConfig = new ClientConfig();
+
+        $ClientConfig->setHeaders(['Authorization' => env('WEB_SOCKET_AUTH')]);
+
+        $client = new WebSocketClient('ws://192.168.0.35:3000', $ClientConfig);
+
+        $client->send(json_encode([
+            'type' => 'sales',
+            'data' => $sales
+        ]));
+    }
+
+    private function sendExecuteds()
+    {
+        $executeds = $this->getAllLastExecuteds();
+
+        $ClientConfig = new ClientConfig();
+
+        $ClientConfig->setHeaders(['Authorization' => env('WEB_SOCKET_AUTH')]);
+
+        $client = new WebSocketClient('ws://192.168.0.35:3000', $ClientConfig);
+
+        $client->send(json_encode([
+            'type' => 'executeds',
+            'data' => $executeds
+        ]));
     }
 }

@@ -3,61 +3,26 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Jenssegers\Agent\Agent;
+use JWTAuth;
 
 class Session extends Model
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'sessions_log';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
-        'user_id', 'ip', 'device', 'platform', 'browser'
+        'user_id', 'ip', 'device', 'platform', 'browser', 'location', 'jwt_token'
     ];
 
-    public static function init($user_id, $ip)
+    public static function logout($jwt_token)
     {
-        $agent = new Agent();
+        if (Session::where('jwt_token', $jwt_token)->count()) {
 
-        $session = DB::table('sessions_log')
-            ->where('user_id', $user_id)
-            ->where('ip', $ip)
-            ->where('device', $agent->device())
-            ->where('platform', $agent->platform())
-            ->where('browser', $agent->browser())
-            ->first();
+            JWTAuth::invalidate($jwt_token);
 
-        if ($session == null) {
-
-            DB::table('sessions_log')->insert([
-                'user_id' => $user_id,
-                'ip' => $ip,
-                'device' => $agent->device(),
-                'platform' => $agent->platform(),
-                'browser' => $agent->browser(),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
+            return true;
 
         }
 
-        else {
-
-            DB::table('sessions_log')
-                ->where('id', $session->id)
-                ->update([
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-
-        }
+        return false;
     }
 }

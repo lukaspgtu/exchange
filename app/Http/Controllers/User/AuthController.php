@@ -2,26 +2,17 @@
 
 namespace App\Http\Controllers\User;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\Controller;
-use App\Mail\SendMail;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use App\Rules\DocumentType;
 use App\Rules\AccountType;
 use App\Rules\CNPJ;
 use App\Rules\CPF;
-use App\Rules\DocumentType;
 use App\Session;
-use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Support\Facades\Hash;
-use JWTAuth;
 use App\User;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
-use Location;
-use WSSC\WebSocketClient;
-use \WSSC\Components\ClientConfig;
-use Google2FA;
-use Illuminate\Support\Facades\Redirect;
 
 class AuthController extends Controller
 {
@@ -177,29 +168,25 @@ class AuthController extends Controller
             'account_type' => $request->account_type,
             'document_number' => $request->document_number,
             'document_date' => formatDate($request->document_date, 'Y-m-d'),
-            'password' => bcrypt($request->password),
-            'twofactor_key' => Google2FA::generateSecretKey()
+            'password' => bcrypt($request->password)
         ]);
+
+        $user->createId();
+
+        $user->createWalletBTC();
+
+        $user->createTwofactorKey();
 
         $user->save();
 
-        $user->generateCode();
+        $user->sendConfirmationEmail();
 
-        $data = [
-            'user' => $user,
-            'location' => Location::get($request->ip())
-        ];
-
-        $message = view('mail.confirmEmail', $data)->render();
-
-        Mail::to($user->email)->send(new SendMail('Confirmação de conta', $message));
-
-        Session::init($user->id, $request->ip());
+        $jwt_token = $user->createSession();
 
         return response()->json([
             'success' => true,
             'message' => 'Usuário cadastrado com sucesso!',
-            'token' => JWTAuth::fromUser($user)
+            'token' => $jwt_token
         ]);
     }
 
@@ -221,16 +208,16 @@ class AuthController extends Controller
 
         }
 
-        if (Hash::check($request->password, $user->password)) {
-
-            Session::init($user->id, $request->ip());
+        if ($user->isCorrectPassword($request->password)) {
 
             if ($user->twofactor_status == 'disabled') {
+
+                $jwt_token = $user->createSession();
 
                 return response()->json([
                     'success' => true,
                     'message' => 'Autenticado com sucesso',
-                    'token' => JWTAuth::fromUser($user)
+                    'token' => $jwt_token
                 ]);
 
             }
@@ -278,14 +265,16 @@ class AuthController extends Controller
 
         }
 
-        if (Hash::check($request->password, $user->password)) {
+        if ($user->isCorrectPassword($request->password)) {
 
-            if (Google2FA::verifyGoogle2FA($user->twofactor_key, $request->twofactor)) {
+            if ($user->isCorrectTwoFactor($request->twofactor)) {
+
+                $jwt_token = $user->createSession();
 
                 return response()->json([
                     'success' => true,
                     'message' => 'Autenticado com sucesso',
-                    'token' => JWTAuth::fromUser($user)
+                    'token' => $jwt_token
                 ]);
 
             }
@@ -318,9 +307,7 @@ class AuthController extends Controller
             'token' => 'required'
         ]);
 
-        try {
-
-            JWTAuth::invalidate($request->token);
+        if (Session::logout($request->token)) {
 
             return response()->json([
                 'success' => true,
@@ -329,91 +316,80 @@ class AuthController extends Controller
 
         }
 
-        catch (JWTException $exception) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Usuário não pode ser desconectado'
-            ]);
-
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Usuário não pode ser desconectado'
+        ]);
 
     }
 
     public function forgotPassword(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string'
-        ]);
+        // $request->validate([
+        //     'email' => 'required|string'
+        // ]);
 
-        $user = User::where('email', $request->email)->first();
+        // $user = User::where('email', $request->email)->first();
 
-        if ($user == null) {
+        // if ($user == null) {
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Usuário não encontrado!'
-            ]);
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Usuário não encontrado!'
+        //     ]);
 
-        }
+        // }
 
-        $user->generateCode();
+        // $user->generateCode();
 
-        $data = [
-            'user' => $user,
-            'location' => Location::get($request->ip())
-        ];
+        // $data = [
+        //     'user' => $user,
+        //     'location' => Location::get($request->ip())
+        // ];
 
-        $message = view('mail.forgotPassword', $data)->render();
+        // $message = view('mail.forgotPassword', $data)->render();
 
-        Mail::to($user->email)->send(new SendMail('Redefinição de senha', $message));
+        // Mail::to($user->email)->send(new SendMail('Redefinição de senha', $message));
 
-        return response()->json([
-            'success' => true,
-            'message' => "Enviamos um código para $user->email"
-        ]);
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => "Enviamos um código para $user->email"
+        // ]);
     }
 
     public function redefinePassword(Request $request)
     {
-        $request->validate([
-            'username' => 'required|string',
-            'code' => 'required|string'
-        ]);
+        // $request->validate([
+        //     'username' => 'required|string',
+        //     'code' => 'required|string'
+        // ]);
 
-        $user = User::where('username', $request->username)
-            ->where('code', $request->code)
-            ->first();
+        // $user = User::where('username', $request->username)
+        //     ->where('code', $request->code)
+        //     ->first();
 
-        if ($user == null) {
+        // if ($user == null) {
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Código inválido',
-            ]);
-        }
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Código inválido',
+        //     ]);
+        // }
 
-        $jwt_token = JWTAuth::fromUser($user);
+        // $jwt_token = JWTAuth::fromUser($user);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Código verificado com sucesso!',
-            'token' => $jwt_token,
-        ]);
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Código verificado com sucesso!',
+        //     'token' => $jwt_token,
+        // ]);
     }
 
-    public function sendConfirmEmail(Request $request)
+    public function sendConfirmEmail()
     {
         $user = Auth::user();
 
-        $data = [
-            'user' => $user,
-            'location' => Location::get($request->ip())
-        ];
-
-        $message = view('mail.confirmEmail', $data)->render();
-
-        Mail::to($user->email)->send(new SendMail('Confirmação de conta', $message));
+        $user->sendConfirmationEmail();
 
         return response()->json([
             'success' => true,
@@ -423,7 +399,9 @@ class AuthController extends Controller
 
     public function activateAccount($code)
     {
-        $user = User::where(DB::raw('md5(code)'), $code)->first();
+        $user = User::select('email_status')
+            ->where(DB::raw('md5(code)'), $code)
+            ->first();
 
         if ($user == null) {
 
@@ -431,17 +409,20 @@ class AuthController extends Controller
 
         }
 
-        $user->email_status = 'confirmed';
-
-        $user->save();
+        $user->update(['email_status' => CONFIRMED]);
 
         return Redirect::to('http://localhost:8000/home');
-
     }
 
     public function auth()
     {
-        $user = Auth::user();
+        $columns = [
+            'id', 'name', 'email', 'account_type', 'balance_BTC', 'balance_use_BTC', 'balance_BRL', 'balance_use_BRL', 'wallet_BTC', 'twofactor_status', 'email_status'
+        ];
+
+        $user = User::select($columns)
+            ->where('id', Auth::id())
+            ->first();
 
         $user->prepareBalances();
 
@@ -451,12 +432,5 @@ class AuthController extends Controller
                 'user' => $user
             ]
         ]);
-    }
-
-    public function socket()
-    {
-        $client = new WebSocketClient('ws://192.168.0.35:3000', new ClientConfig());
-        $client->send(json_encode(['order' => 19491]));
-        // echo $client->receive();
     }
 }

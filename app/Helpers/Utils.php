@@ -78,8 +78,7 @@ if (!function_exists('fee')) {
     }
 }
 
-if(!function_exists('validateCNPJ'))
-{
+if(!function_exists('validateCNPJ')) {
     function validateCNPJ($cnpj)
     {
 		$cnpj = preg_replace('/[^0-9]/', '', (string) $cnpj);

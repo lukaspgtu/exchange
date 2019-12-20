@@ -234,6 +234,7 @@ return [
         'Location' => Stevebauman\Location\Facades\Location::class,
         'Image' => Intervention\Image\Facades\Image::class,
         'Agent' => Jenssegers\Agent\Facades\Agent::class,
+        'AjaxJSON' => App\Utils\AjaxJSON::class
     ],
 
 ];

@@ -14,6 +14,6 @@ class Extract extends Model
      * @var array
      */
     protected $fillable = [
-        'reference_id', 'type', 'value'
+        'user_id', 'reference_id', 'type', 'value', 'description'
     ];
 }

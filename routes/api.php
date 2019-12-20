@@ -11,7 +11,8 @@
 |
 */
 
-# Auth
+# Auth Routes
+Route::get('activateAccount/{code}', 'User\AuthController@activateAccount');
 Route::post('verifyEmail', 'User\AuthController@verifyEmail');
 Route::post('verifyDocumentNumber', 'User\AuthController@verifyDocumentNumber');
 Route::post('register', 'User\AuthController@register');
@@ -19,23 +20,33 @@ Route::post('login', 'User\AuthController@login')->middleware('assign.guard:user
 Route::post('loginTwoFactor', 'User\AuthController@loginTwoFactor')->middleware('assign.guard:users');
 Route::post('forgotPassword', 'User\AuthController@forgotPassword');
 Route::post('redefinePassword', 'User\AuthController@redefinePassword');
-Route::get('activateAccount/{code}', 'User\AuthController@activateAccount');
-Route::get('socket', 'User\AuthController@socket');
 
+# Order Routes
+Route::get('orderStreaming', 'User\OrderController@orderStreaming');
 
 Route::group(['middleware' => ['auth.jwt', 'assign.guard:users']], function () {
 
-    # Auth
-    Route::get('logout', 'User\AuthController@logout');
+    # Auth Routes
+    Route::post('logout', 'User\AuthController@logout');
     Route::get('auth', 'User\AuthController@auth');
     Route::get('sendConfirmEmail', 'User\AuthController@sendConfirmEmail');
 
-    # Google2FA
+    # Account Routes
+    Route::get('operationalLimits', 'User\AccountController@operationalLimits');
+    Route::get('sessions', 'User\AccountController@sessions');
+    Route::put('updateEmail', 'User\AccountController@updateEmail');
+    Route::put('updatePassword', 'User\AccountController@updatePassword');
+
+    # Google2FA Routes
     Route::get('qrcode2FA', 'User\Google2FAController@qrcode2FA');
     Route::post('verify2FA', 'User\Google2FAController@verify2FA');
 
-    # Order
-    Route::get('orders', 'User\OrderController@orders');
+    # Order Routes
+    Route::get('allOrders', 'User\OrderController@allOrders');
+    Route::get('ordersCanceled', 'User\OrderController@ordersCanceled');
+    Route::get('ordersExecuted', 'User\OrderController@ordersExecuted');
+    Route::get('ordersRunning', 'User\OrderController@ordersRunning');
+    Route::get('ordersWaiting', 'User\OrderController@ordersWaiting');
     Route::post('buyLimitedPrice', 'User\OrderController@buyLimitedPrice');
     Route::post('saleLimitedPrice', 'User\OrderController@saleLimitedPrice');
     Route::post('buyMarketPrice', 'User\OrderController@buyMarketPrice');
@@ -43,5 +54,12 @@ Route::group(['middleware' => ['auth.jwt', 'assign.guard:users']], function () {
     Route::post('simulateBuy', 'User\OrderController@simulateBuy');
     Route::post('buy', 'User\OrderController@buy');
     Route::post('sale', 'User\OrderController@sale');
+
+    # Extracts Routes
+    Route::get('allExtracts', 'User\ExtractController@allExtracts');
+    Route::get('buyExtracts', 'User\ExtractController@buyExtracts');
+    Route::get('buyFeeExtracts', 'User\ExtractController@buyFeeExtracts');
+    Route::get('saleExtracts', 'User\ExtractController@saleExtracts');
+    Route::get('saleFeeExtracts', 'User\ExtractController@saleFeeExtracts');
 
 });

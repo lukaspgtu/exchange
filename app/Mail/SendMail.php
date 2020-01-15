@@ -30,7 +30,7 @@ class SendMail extends Mailable
      */
     public function build()
     {
-        return $this->from('noreply@diamondtrader.co', 'Diamond Trading')
+        return $this->from('lukaspgtu@hotmail.com', 'ProExBit')
             ->subject($this->subject)
             ->html($this->message);
     }

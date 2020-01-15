@@ -397,11 +397,9 @@ class AuthController extends Controller
         ]);
     }
 
-    public function activateAccount($code)
+    public function activateAccount($id)
     {
-        $user = User::select('email_status')
-            ->where(DB::raw('md5(code)'), $code)
-            ->first();
+        $user = User::where('id', $id)->first();
 
         if ($user == null) {
 
@@ -409,15 +407,15 @@ class AuthController extends Controller
 
         }
 
-        $user->update(['email_status' => CONFIRMED]);
+        $user->confirmateAccount();
 
-        return Redirect::to('http://localhost:8000/home');
+        return Redirect::to('http://broker.proexbit.com');
     }
 
     public function auth()
     {
         $columns = [
-            'id', 'name', 'email', 'account_type', 'balance_BTC', 'balance_use_BTC', 'balance_BRL', 'balance_use_BRL', 'wallet_BTC', 'twofactor_status', 'email_status'
+            'id', 'name', 'document_number', 'document_date', 'email', 'account_type', 'balance_BTC', 'balance_use_BTC', 'balance_BRL', 'balance_use_BRL', 'wallet_BTC', 'twofactor_status', 'email_status'
         ];
 
         $user = User::select($columns)

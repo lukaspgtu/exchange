@@ -82,6 +82,13 @@ class User extends Authenticatable implements JWTSubject
         Mail::to($this->email)->send(new SendMail('Confirmação de conta', $message));
     }
 
+    public function confirmateAccount()
+    {
+        $this->email_status = CONFIRMED;
+
+        $this->save();
+    }
+
     public function createSession()
     {
         $jwt_token = JWTAuth::fromUser($this);
@@ -203,15 +210,15 @@ class User extends Authenticatable implements JWTSubject
 
     public function getOrdersByStatus($status)
     {
-        $amount = 'if(type="sale", cast((amount / pow(10,8)) as double(11,8)), amount) as amount';
+        $amount = "if(type='sale', cast((amount / pow(10,8)) as double(11,8)), amount) as amount";
 
-        $fee = 'if(type="buy", cast((fee / pow(10,8)) as double(11,8)), fee) as fee';
+        $fee = "if(type='buy', cast((fee / pow(10,8)) as double(11,8)), fee) as fee";
 
-        $total = 'if(type="buy", cast((amount / unit_price) as double(11,8)), cast(((amount / pow(10,8)) * unit_price) as double(11,2))) as total';
+        $total = "if(type='buy', cast((amount / unit_price) as double(11,8)), cast(((amount / pow(10,8)) * unit_price) as double(11,2))) as total";
 
-        $processed = 'if(type="sale", cast((processed / pow(10,8)) as double(11,8)), processed) as processed';
+        $processed = "if(type='sale', cast((processed / pow(10,8)) as double(11,8)), processed) as processed";
 
-        $position = 'if(position <> 0, position, null) as position';
+        $position = "if(position <> 0, position, null) as position";
 
         $raw = "created_at, type, $amount, $fee, unit_price, $total, $processed, $position, status, executed_at";
 

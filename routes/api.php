@@ -12,7 +12,7 @@
 */
 
 # Auth Routes
-Route::get('activateAccount/{code}', 'User\AuthController@activateAccount');
+Route::get('activateAccount/{id}', 'User\AuthController@activateAccount')->name('activateAccount');
 Route::post('verifyEmail', 'User\AuthController@verifyEmail');
 Route::post('verifyDocumentNumber', 'User\AuthController@verifyDocumentNumber');
 Route::post('register', 'User\AuthController@register');
@@ -20,6 +20,7 @@ Route::post('login', 'User\AuthController@login')->middleware('assign.guard:user
 Route::post('loginTwoFactor', 'User\AuthController@loginTwoFactor')->middleware('assign.guard:users');
 Route::post('forgotPassword', 'User\AuthController@forgotPassword');
 Route::post('redefinePassword', 'User\AuthController@redefinePassword');
+
 
 # Order Routes
 Route::get('orderStreaming', 'User\OrderController@orderStreaming');

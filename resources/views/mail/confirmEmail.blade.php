@@ -83,7 +83,7 @@
             }
         }
         .primary {
-            color: #0FACEA !important;
+            color: #2C303B !important;
             font-weight: 500 !important;
         }
         .light {
@@ -97,7 +97,7 @@
             background: #F8F8F8;
         }
         .bg_primary {
-            background: #0FACEA;
+            background: #2C303B;
         }
         h1,
         h2,
@@ -118,13 +118,13 @@
             color: rgba(0, 0, 0, .4);
         }
         a {
-            color: #0FACEA;
+            color: #2C303B;
         }
         .btn {
             border-radius: 1px;
             cursor: pointer;
             border: 0;
-            background: #0FACEA;
+            background: #2C303B;
             color: #FFF;
             font-weight: 600;
             font-size: 16px;
@@ -143,7 +143,7 @@
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr>
                                 <td class="logo" style="text-align: center;">
-                                    <img src="http://diamondtrader.co/assets/img/logo.png" width="128" style="margin-bottom: 20px">
+                                    <img src="http://api.proexbit.com/storage/logo2.png" width="250" style="margin-bottom: 30px">
                                 </td>
                             </tr>
                         </table>
@@ -158,7 +158,7 @@
                     <td valign="middle" class="hero bg_white" style="padding: 3em 0 0 0;">
                         <div class="text" style="text-align: center;">
                             <h1 class="primary">Olá {{ explode(' ', $user->name)[0] }}!</h1>
-                            <p style="font-size: 16px;">Bem-vindo à BitcoinTrade!</p>
+                            <p style="font-size: 16px;">Bem-vindo à ProExBit!</p>
                             <p style="font-size: 16px;">Para começar a utilizar sua conta, clique no botão abaixo<br>para confirmar o seu e-mail e ativar sua conta.</p>
                         </div>
                     </td>
@@ -166,16 +166,7 @@
                 <tr>
                     <td valign="middle" class="hero bg_white" style="padding: 1em 0 0 0;">
                         <div class="text" style="text-align: center;">
-                            <a href="http://localhost:8000/api/activateAccount/{{ md5($user->code) }}" class="btn">Ativar minha conta</a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td valign="middle" class="hero bg_white" style="padding: 1em 0 0 0;">
-                        <div class="text" style="text-align: center;">
-                            <p style="font-size: 16px;">
-                                Obrigado.<br>Equipe BitcoinTrade
-                            </p>
+                            <a href="{{ route('activateAccount', ['id' => $user->id]) }}" class="btn">Ativar minha conta</a>
                         </div>
                     </td>
                 </tr>
@@ -192,22 +183,18 @@
                     <td valign="middle" class="hero bg_white" style="padding: 1em 0 0 0;">
                         <div class="text" style="text-align: center;">
                             <p style="font-size: 16px;">
-                                Em caso de dúvidas, envie um e-mail para <br><a href="mail:suporte@bitcointrade.com.br">suporte@bitcointrade.com.br</a>.
+                                Em caso de dúvidas, envie um e-mail para <br><a href="mail:suporte@proexbit.com">suporte@proexbit.com</a>
                             </p>
                         </div>
                     </td>
                 </tr>
                 <tr>
-                    <td class="bg_light" style="text-align: center;">
-                        Cadastrado em: <b style="margin-left: 5px">{{ date('d M Y - H:i', strtotime($user->created_at)) }}</b>
-
-                        @if ($location)
-
-                            <br>Local: <b style="margin-left: 5px">{{ $location->cityName }} - {{ $location->regionName }} - {{ $location->countryName }}</b> <br>
-                            IP: <b style="margin-left: 5px">{{ $location->ip }}</b>
-
-                        @endif
-
+                    <td valign="middle" class="hero bg_white" style="padding: 1em 0 0 0;">
+                        <div class="text" style="text-align: center;">
+                            <p style="font-size: 16px;">
+                                Obrigado.<br>Equipe ProExBit.
+                            </p>
+                        </div>
                     </td>
                 </tr>
             </table>

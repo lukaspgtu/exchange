@@ -190,13 +190,13 @@ class User extends Authenticatable implements JWTSubject
 
     public function getOrders()
     {
-        $amount = 'if(type="sale", cast((amount / pow(10,8)) as double(11,8)), amount) as amount';
+        $amount = 'if(type="sale", convert((amount / pow(10,8)), double(11,8)), amount) as amount';
 
-        $fee = 'if(type="buy", cast((fee / pow(10,8)) as double(11,8)), fee) as fee';
+        $fee = 'if(type="buy", convert((fee / pow(10,8)), double(11,8)), fee) as fee';
 
-        $total = 'if(type="buy", cast((amount / unit_price) as double(11,8)), cast(((amount / pow(10,8)) * unit_price) as double(11,2))) as total';
+        $total = 'if(type="buy", convert((amount / unit_price), double(11,8)), convert(((amount / pow(10,8)) * unit_price), double(11,2))) as total';
 
-        $processed = 'if(type="sale", cast((processed / pow(10,8)) as double(11,8)), processed) as processed';
+        $processed = 'if(type="sale", convert((processed / pow(10,8)), double(11,8)), processed) as processed';
 
         $position = 'if(position <> 0, position, null) as position';
 
@@ -210,13 +210,13 @@ class User extends Authenticatable implements JWTSubject
 
     public function getOrdersByStatus($status)
     {
-        $amount = "if(type='sale', cast((amount / pow(10,8)) as double(11,8)), amount) as amount";
+        $amount = "if(type='sale', convert((amount / pow(10,8)), double(11,8)), amount) as amount";
 
-        $fee = "if(type='buy', cast((fee / pow(10,8)) as double(11,8)), fee) as fee";
+        $fee = "if(type='buy', convert((fee / pow(10,8)), double(11,8)), fee) as fee";
 
-        $total = "if(type='buy', cast((amount / unit_price) as double(11,8)), cast(((amount / pow(10,8)) * unit_price) as double(11,2))) as total";
+        $total = "if(type='buy', convert((amount / unit_price), double(11,8)), convert(((amount / pow(10,8)) * unit_price), double(11,2))) as total";
 
-        $processed = "if(type='sale', cast((processed / pow(10,8)) as double(11,8)), processed) as processed";
+        $processed = "if(type='sale', convert((processed / pow(10,8)), double(11,8)), processed) as processed";
 
         $position = "if(position <> 0, position, null) as position";
 

@@ -43,9 +43,9 @@ class Order extends Model
 
     public static function getAllLastBuys()
     {
-        $amount = 'convert((amount - processed), double(11,2)) as amount';
+        $amount = 'convert((amount - processed), decimal(11,2)) as amount';
 
-        $total = 'convert((amount / unit_price), double(11,8)) as total';
+        $total = 'convert((amount / unit_price), decimal(11,8)) as total';
 
         $raw = "$amount, unit_price, $total";
 
@@ -59,9 +59,9 @@ class Order extends Model
 
     public static function getAllLastSales()
     {
-        $amount = 'convert(((amount - processed) / pow(10,8)), double(11,8)) as amount';
+        $amount = 'convert(((amount - processed) / pow(10,8)), decimal(11,8)) as amount';
 
-        $total = 'convert(((amount / pow(10,8)) * unit_price), double(11,2)) as total';
+        $total = 'convert(((amount / pow(10,8)) * unit_price), decimal(11,2)) as total';
 
         $raw = "$amount, unit_price, $total";
 
@@ -75,7 +75,7 @@ class Order extends Model
 
     public static function getAllLastExecuteds()
     {
-        $amount = 'if(type="sale", convert((amount / pow(10,8)), double(11,8)), amount) as amount';
+        $amount = 'if(type="sale", convert((amount / pow(10,8)), decimal(11,8)), amount) as amount';
 
         $raw = "executed_at, type, $amount, unit_price";
 

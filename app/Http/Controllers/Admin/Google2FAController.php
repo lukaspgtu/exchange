@@ -15,6 +15,8 @@ class Google2FAController extends Controller
 
         if ($admin->twofactor_status == 'disabled') {
 
+            $admin->createTwofactorKey();
+
             $qrcode = Google2FA::getQRCodeInline(
                 config('app.name'),
                 $admin->email,

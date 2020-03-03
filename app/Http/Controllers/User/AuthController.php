@@ -128,11 +128,13 @@ class AuthController extends Controller
             $request->validate([
                 'document_number' => [new CPF, 'unique:users']
             ]);
+
         } elseif ($request->account_type == 'legal') {
 
             $request->validate([
                 'document_number' => [new CNPJ, 'unique:users']
             ]);
+
         } else {
 
             $request->validate([

@@ -265,7 +265,7 @@
                                     <br> {{ $ip }}
                                 </p>
 
-                                @isset($browser)
+                                @isset($browser && $platform)
 
                                     <p>
                                         <small><b>Dispositivo:</b></small>

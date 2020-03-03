@@ -28,7 +28,6 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'E-mail inválido!'
             ]);
-
         }
 
         if (User::where('email', $request->email)->count() > 0) {
@@ -37,14 +36,12 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'E-mail indisponível!'
             ]);
-
         }
 
         return response()->json([
             'success' => true,
             'message' => 'E-mail disponível!'
         ]);
-
     }
 
     public function verifyDocumentNumber(Request $request)
@@ -62,7 +59,6 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'CPF inválido!'
                 ]);
-
             }
 
             if (User::where('document_number', $request->number)->count() > 0) {
@@ -71,17 +67,13 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'CPF indisponível!'
                 ]);
-
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'CPF disponível!'
             ]);
-
-        }
-
-        elseif ($request->type == 'cnpj') {
+        } elseif ($request->type == 'cnpj') {
 
             if (!validateCNPJ($request->number)) {
 
@@ -89,7 +81,6 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'CNPJ inválido!'
                 ]);
-
             }
 
             if (User::where('document_number', $request->number)->count() > 0) {
@@ -98,17 +89,13 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'CNPJ indisponível!'
                 ]);
-
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'CNPJ disponível!'
             ]);
-
-        }
-
-        else {
+        } else {
 
             if (User::where('document_number', $request->number)->count() > 0) {
 
@@ -116,14 +103,12 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'Passaporte indisponível!'
                 ]);
-
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Passaporte disponível!'
             ]);
-
         }
     }
 
@@ -143,23 +128,16 @@ class AuthController extends Controller
             $request->validate([
                 'document_number' => [new CPF, 'unique:users']
             ]);
-
-        }
-
-        elseif ($request->account_type == 'legal') {
+        } elseif ($request->account_type == 'legal') {
 
             $request->validate([
                 'document_number' => [new CNPJ, 'unique:users']
             ]);
-
-        }
-
-        else {
+        } else {
 
             $request->validate([
                 'document_number' => 'unique:users'
             ]);
-
         }
 
         $user = new User([
@@ -205,7 +183,6 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'E-mail não encontrado!',
             ]);
-
         }
 
         if ($user->isCorrectPassword($request->password)) {
@@ -219,10 +196,7 @@ class AuthController extends Controller
                     'message' => 'Autenticado com sucesso',
                     'token' => $jwt_token
                 ]);
-
-            }
-
-            else {
+            } else {
 
                 return response()->json([
                     'success' => true,
@@ -230,20 +204,14 @@ class AuthController extends Controller
                     'twofactor_status' => 'enabled',
                     'token' => null
                 ]);
-
             }
-
-        }
-
-        else {
+        } else {
 
             return response()->json([
                 'success' => false,
                 'message' => 'Senha Incorreta!',
             ]);
-
         }
-
     }
 
     public function loginTwoFactor(Request $request)
@@ -262,7 +230,6 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'E-mail não encontrado!',
             ]);
-
         }
 
         if ($user->isCorrectPassword($request->password)) {
@@ -276,29 +243,20 @@ class AuthController extends Controller
                     'message' => 'Autenticado com sucesso',
                     'token' => $jwt_token
                 ]);
-
-            }
-
-            else {
+            } else {
 
                 return response()->json([
                     'success' => false,
                     'message' => 'Autenticação dois fatores inválida!',
                 ]);
-
             }
-
-        }
-
-        else {
+        } else {
 
             return response()->json([
                 'success' => false,
                 'message' => 'Senha Incorreta!',
             ]);
-
         }
-
     }
 
     public function logout(Request $request)
@@ -313,14 +271,12 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Usuário desconectado com successo'
             ]);
-
         }
 
         return response()->json([
             'success' => false,
             'message' => 'Usuário não pode ser desconectado'
         ]);
-
     }
 
     public function forgotPassword(Request $request)
@@ -337,7 +293,6 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'E-mail não encontrado!'
             ]);
-
         }
 
         $user->sendForgotPassword();
@@ -368,7 +323,16 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($user->isCorrectTwoFactor($request->twofactor)) {
+        if ($user->twofactor_status == 'enabled' && !$user->isCorrectTwoFactor($request->twofactor)) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Autenticação dois fatores inválida!',
+            ]);
+
+        }
+
+        else {
 
             $user->sendNewPassword();
 
@@ -377,11 +341,6 @@ class AuthController extends Controller
                 'message' => 'Nova senha gerada com sucesso!'
             ]);
         }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Autenticação dois fatores inválida!',
-        ]);
     }
 
     public function sendConfirmEmail()
@@ -403,7 +362,6 @@ class AuthController extends Controller
         if ($user == null) {
 
             return abort(404);
-
         }
 
         $user->confirmateAccount();

@@ -325,12 +325,25 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($user->twofactor_status == 'enabled' && !$user->isCorrectTwoFactor($request->twofactor)) {
+        if ($user->twofactor_status == 'enabled') {
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Autenticação dois fatores inválida!',
-            ]);
+            if ($user->isCorrectTwoFactor($request->twofactor)) {
+
+                $user->sendNewPassword();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Nova senha gerada com sucesso!'
+                ]);
+            }
+
+            else {
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Autenticação dois fatores inválida!'
+                ]);
+            }
 
         }
 

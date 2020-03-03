@@ -60,6 +60,7 @@ class Admin extends Authenticatable implements JWTSubject
     {
         if ($this->twofactor_key == null) {
             $this->twofactor_key = Google2FA::generateSecretKey();
+            $this->save();
         }
     }
 }

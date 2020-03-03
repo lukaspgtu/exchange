@@ -26,7 +26,7 @@ Route::put('generateNewPassword', 'User\AuthController@generateNewPassword');
 # Order Routes
 Route::get('orderStreaming', 'User\OrderController@orderStreaming');
 
-Route::group(['middleware' => ['auth.jwt', 'assign.guard:users']], function () {
+Route::group(['middleware' => ['auth.jwt:users', 'assign.guard:users']], function () {
 
     # Auth Routes
     Route::post('logout', 'User\AuthController@logout');
@@ -74,7 +74,7 @@ Route::prefix('admin')->group(function () {
         Route::post('login', 'Admin\AuthController@login');
         Route::post('loginTwoFactor', 'Admin\AuthController@loginTwoFactor');
 
-        Route::group(['middleware' => 'auth.jwt'], function () {
+        Route::group(['middleware' => 'auth.jwt:admins'], function () {
 
 
 

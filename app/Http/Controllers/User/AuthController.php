@@ -144,7 +144,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'account_type' => $request->account_type,
-            'document_number' => $request->document_number,
+            'document_number' => removeSymbols($request->document_number),
             'document_date' => formatDate($request->document_date, 'Y-m-d'),
             'password' => bcrypt($request->password)
         ]);

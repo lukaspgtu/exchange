@@ -237,7 +237,7 @@
 
                         <div class="text" style="text-align: center;">
 
-                            <a href="{{ route('activateAccount', ['id' => $user->id]) }}" class="btn">Gerar nova senha</a>
+                            <a href="https://broker.proexbit.com/recover-password?hash={{ $user->id }}" class="btn">Gerar nova senha</a>
 
                         </div>
 
@@ -265,10 +265,14 @@
                                     <br> {{ $ip }}
                                 </p>
 
-                                <p>
-                                    <small><b>Dispositivo:</b></small>
-                                    <br> {{ $browser }} / {{ $platform }}
-                                </p>
+                                @isset($browser)
+
+                                    <p>
+                                        <small><b>Dispositivo:</b></small>
+                                        <br> {{ $browser }} / {{ $platform }}
+                                    </p>
+
+                                @endisset
 
                                 @isset($location)
 

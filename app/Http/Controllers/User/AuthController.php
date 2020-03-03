@@ -14,9 +14,6 @@ use App\Rules\CPF;
 use App\Session;
 use App\User;
 
-use Jenssegers\Agent\Agent;
-use Location;
-
 class AuthController extends Controller
 {
     public function verifyEmail(Request $request)
@@ -372,6 +369,8 @@ class AuthController extends Controller
         }
 
         if ($user->isCorrectTwoFactor($request->twofactor)) {
+
+            $user->sendNewPassword();
 
             return response()->json([
                 'success' => true,

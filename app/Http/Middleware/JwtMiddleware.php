@@ -18,13 +18,18 @@ class JwtMiddleware extends BaseMiddleware
     * @return mixed
     */
 
-    public function handle($request, Closure $next, $guard = null)
+    public function handle($request, Closure $next)
     {
         try {
 
-            $user = JWTAuth::parseToken()->authenticate();
+            if (!JWTAuth::parseToken()->authenticate()) {
 
-            dd($user);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Token invalido!'
+                ], 401);
+
+            }
 
         }
         catch (Exception $e) {

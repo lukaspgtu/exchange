@@ -72,7 +72,7 @@ Route::group(['middleware' => 'assign.guard:users'], function () {
 # Admin Routes
 Route::prefix('admin')->group(function () {
 
-    Route::group(['middleware' => 'assign.guard:users'], function () {
+    Route::group(['middleware' => 'assign.guard:admins'], function () {
 
         Route::post('login', 'Admin\AuthController@login');
         Route::post('loginTwoFactor', 'Admin\AuthController@loginTwoFactor');

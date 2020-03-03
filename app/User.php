@@ -38,6 +38,16 @@ class User extends Authenticatable implements JWTSubject
         'password', 'twofactor_key'
     ];
 
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
     public function createId()
     {
         $this->id = md5(uniqid($this->email));
@@ -72,14 +82,49 @@ class User extends Authenticatable implements JWTSubject
 
     public function sendConfirmationEmail()
     {
-        $data = [
-            'user' => $this,
-            'location' => Location::get($_SERVER['REMOTE_ADDR'])
-        ];
+        $data = ['user' => $this];
 
         $message = view('mail.confirmEmail', $data)->render();
 
         Mail::to($this->email)->send(new SendMail('Confirmação de conta', $message));
+    }
+
+    public function sendForgotPassword()
+    {
+        $location = Location::get($_SERVER['REMOTE_ADDR']);
+
+        $agent = new Agent();
+
+        $data = [
+            'user' => $this,
+            'location' => $location ? "$location->countryName, $location->cityName - $location->regionName" : null,
+            'device' => $agent->device(),
+            'platform' => $agent->platform(),
+            'browser' => $agent->browser(),
+            'ip' => $_SERVER['REMOTE_ADDR']
+        ];
+
+        $message = view('mail.forgotPassword', $data)->render();
+
+        Mail::to($this->email)->send(new SendMail('Recuperação de senha', $message));
+    }
+
+    public function sendNewPassword()
+    {
+        $new_password = generatePasswd();
+
+        $this->password = bcrypt($new_password);
+
+        $this->save();
+
+        $data = [
+            'user' => $this,
+            'new_password' => $new_password
+        ];
+
+        $message = view('mail.newPassword', $data)->render();
+
+        Mail::to($this->email)->send(new SendMail('Nova senha', $message));
     }
 
     public function confirmateAccount()
@@ -141,16 +186,6 @@ class User extends Authenticatable implements JWTSubject
         }
 
         return $jwt_token;
-    }
-
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getJWTCustomClaims()
-    {
-        return [];
     }
 
     public function isCorrectPassword($password)

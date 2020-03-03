@@ -208,7 +208,7 @@
 
                     <td valign="middle" class="hero bg_primary" style="padding: 1em 0 0 0; text-align: center">
 
-                        <h1 class="light">Recuperação de senha</h1>
+                        <h1 class="light">Sua nova senha</h1>
 
                     </td>
 
@@ -222,64 +222,9 @@
 
                             <h1 class="primary">Olá {{ explode(' ', $user->name)[0] }}!</h1>
 
-                            <p style="font-size: 16px;">Foi solicitada uma nova senha para acessar sua conta.</p>
+                            <p style="font-size: 16px;">Sua nova senha de acesso:<br><b>{{ $new_password }}</b></p>
 
-                            <p style="font-size: 16px;">Clique no botão a seguir para gerar uma nova senha:</p>
-                        </div>
-
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <td valign="middle" class="hero bg_white" style="padding: 1em 0 0 0;">
-
-                        <div class="text" style="text-align: center;">
-
-                            <a href="{{ route('activateAccount', ['id' => $user->id]) }}" class="btn">Gerar nova senha</a>
-
-                        </div>
-
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <td valign="middle" class="hero bg_white" style="padding: 1em 0 0 0;">
-
-                        <div class="text" style="text-align: center;">
-
-                            <p style="font-size: 16px;">
-
-                                Dados do solicitante:
-
-                                <p>
-                                    <small><b>Data:</b></small>
-                                    <br> {{ date('d/m/Y') }} às {{ date('H:i') }}
-                                </p>
-
-                                <p>
-                                    <small><b>Endereço IP:</b></small>
-                                    <br> {{ $ip }}
-                                </p>
-
-                                <p>
-                                    <small><b>Dispositivo:</b></small>
-                                    <br> {{ $browser }} / {{ $platform }}
-                                </p>
-
-                                @isset($location)
-
-                                    <p>
-                                        <small><b>Local:</b></small>
-                                        <br> {{ $location }}
-                                    </p>
-
-                                @endisset
-
-                            </p>
+                            <p style="font-size: 16px;">Acesse a área Perfil no site para trocar a senha<br>para uma outra de sua preferência.</p>
 
                         </div>
 

@@ -183,3 +183,40 @@ if (!function_exists('validateEmail')) {
         }
     }
 }
+
+if (!function_exists('generatePasswd')) {
+
+    function generatePasswd()
+    {
+        $symbols = '@#$&*;._';
+
+        $letters = 'aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ';
+
+        $numbers = '0123456789';
+
+        $passwd = "";
+
+        while (strlen($passwd) < 10) {
+
+            $passwd .= $letters[rand(0, strlen($letters) - 1)];
+
+            if (rand(0, 1)) {
+                $passwd .= $numbers[rand(0, strlen($numbers) - 1)];
+            }
+            if (rand(0, 1)) {
+                $passwd .= $symbols[rand(0, strlen($symbols) - 1)];
+            }
+
+        }
+
+        return $passwd;
+    }
+}
+
+if (!function_exists('removeSymbols')) {
+
+    function removeSymbols($string)
+    {
+        return preg_replace('/[^0-9]/', '', $string);
+    }
+}

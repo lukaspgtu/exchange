@@ -19,8 +19,7 @@ Route::post('register', 'User\AuthController@register');
 Route::post('login', 'User\AuthController@login')->middleware('assign.guard:users');
 Route::post('loginTwoFactor', 'User\AuthController@loginTwoFactor')->middleware('assign.guard:users');
 Route::post('forgotPassword', 'User\AuthController@forgotPassword');
-Route::post('redefinePassword', 'User\AuthController@redefinePassword');
-
+Route::put('generateNewPassword', 'User\AuthController@generateNewPassword');
 
 # Order Routes
 Route::get('orderStreaming', 'User\OrderController@orderStreaming');

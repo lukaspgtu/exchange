@@ -14,6 +14,9 @@ use App\Rules\CPF;
 use App\Session;
 use App\User;
 
+use Jenssegers\Agent\Agent;
+use Location;
+
 class AuthController extends Controller
 {
     public function verifyEmail(Request $request)
@@ -303,8 +306,8 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $this->validate($request, [
-            'token' => 'required'
+        $request->validate([
+            'token' => 'required|string'
         ]);
 
         if (Session::logout($request->token)) {
@@ -325,69 +328,66 @@ class AuthController extends Controller
 
     public function forgotPassword(Request $request)
     {
-        // $request->validate([
-        //     'email' => 'required|string'
-        // ]);
+        $request->validate([
+            'email' => 'required|string'
+        ]);
 
-        // $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-        // if ($user == null) {
+        if ($user == null) {
 
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Usuário não encontrado!'
-        //     ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'E-mail não encontrado!'
+            ]);
 
-        // }
+        }
 
-        // $user->generateCode();
+        $user->sendForgotPassword();
 
-        // $data = [
-        //     'user' => $user,
-        //     'location' => Location::get($request->ip())
-        // ];
-
-        // $message = view('mail.forgotPassword', $data)->render();
-
-        // Mail::to($user->email)->send(new SendMail('Redefinição de senha', $message));
-
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => "Enviamos um código para $user->email"
-        // ]);
+        return response()->json([
+            'success' => true,
+            'message' => "Enviamos uma mensagem para $user->email"
+        ]);
     }
 
-    public function redefinePassword(Request $request)
+    public function generateNewPassword(Request $request)
     {
-        // $request->validate([
-        //     'username' => 'required|string',
-        //     'code' => 'required|string'
-        // ]);
+        $request->validate([
+            'hash' => 'required|string',
+            'document_number' => 'required|string',
+            'twofactor' => 'required|string'
+        ]);
 
-        // $user = User::where('username', $request->username)
-        //     ->where('code', $request->code)
-        //     ->first();
+        $user = User::find($request->hash);
 
-        // if ($user == null) {
+        $request->document_number = removeSymbols($request->document_number);
 
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Código inválido',
-        //     ]);
-        // }
+        if ($user == null ||  $request->document_number != $user->document_number) {
 
-        // $jwt_token = JWTAuth::fromUser($user);
+            return response()->json([
+                'success' => false,
+                'message' => 'Você não tem permissão para alterar a senha desta conta!',
+            ]);
+        }
 
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => 'Código verificado com sucesso!',
-        //     'token' => $jwt_token,
-        // ]);
+        if ($user->isCorrectTwoFactor($request->twofactor)) {
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Nova senha gerada com sucesso!'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Autenticação dois fatores inválida!',
+        ]);
     }
 
     public function sendConfirmEmail()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $user->sendConfirmationEmail();
 

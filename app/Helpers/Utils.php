@@ -188,7 +188,7 @@ if (!function_exists('generatePasswd')) {
 
     function generatePasswd()
     {
-        $symbols = '@#$&*;._';
+        $symbols = '@#$&*;_';
 
         $letters = 'aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ';
 

@@ -30,9 +30,9 @@ Route::group(['middleware' => 'assign.guard:users'], function () {
     Route::group(['middleware' => 'auth.jwt'], function () {
 
         # Auth Routes
-        Route::post('logout', 'User\AuthController@logout');
         Route::get('auth', 'User\AuthController@auth');
         Route::get('sendConfirmEmail', 'User\AuthController@sendConfirmEmail');
+        Route::post('logout', 'User\AuthController@logout');
 
         # Account Routes
         Route::get('operationalLimits', 'User\AccountController@operationalLimits');
@@ -79,7 +79,9 @@ Route::prefix('admin')->group(function () {
 
         Route::group(['middleware' => 'auth.jwt'], function () {
 
-
+            # Google2FA Routes
+            Route::get('qrcode2FA', 'Admin\Google2FAController@qrcode2FA');
+            Route::post('verify2FA', 'Admin\Google2FAController@verify2FA');
 
         });
 

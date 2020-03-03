@@ -265,14 +265,14 @@
                                     <br> {{ $ip }}
                                 </p>
 
-                                @isset($browser && $platform)
+                                @if(isset($browser) && isset($platform))
 
                                     <p>
                                         <small><b>Dispositivo:</b></small>
                                         <br> {{ $browser }} / {{ $platform }}
                                     </p>
 
-                                @endisset
+                                @endif
 
                                 @isset($location)
 

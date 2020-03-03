@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -61,5 +63,23 @@ Route::group(['middleware' => ['auth.jwt', 'assign.guard:users']], function () {
     Route::get('buyFeeExtracts', 'User\ExtractController@buyFeeExtracts');
     Route::get('saleExtracts', 'User\ExtractController@saleExtracts');
     Route::get('saleFeeExtracts', 'User\ExtractController@saleFeeExtracts');
+
+});
+
+# Admin Routes
+Route::prefix('admin')->group(function () {
+
+    Route::group(['middleware' => 'assign.guard:users'], function () {
+
+        Route::post('login', 'Admin\AuthController@login');
+        Route::post('loginTwoFactor', 'Admin\AuthController@loginTwoFactor');
+
+        Route::group(['middleware' => 'auth.jwt'], function () {
+
+
+
+        });
+
+    });
 
 });

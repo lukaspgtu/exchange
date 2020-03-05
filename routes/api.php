@@ -86,7 +86,7 @@ Route::prefix('admin')->group(function () {
 
             # Users Routes
             Route::get('users', 'Admin\UserController@users');
-            Route::get('user/{id}', 'Admin\UserController@user');
+            Route::get('user/{user}', 'Admin\UserController@user');
 
         });
     });

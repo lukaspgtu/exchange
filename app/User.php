@@ -86,49 +86,61 @@ class User extends Authenticatable implements JWTSubject
 
     public function sendConfirmationEmail()
     {
-        $data = ['user' => $this];
+        try {
 
-        $message = view('mail.confirmEmail', $data)->render();
+            $data = ['user' => $this];
 
-        Mail::to($this->email)->send(new SendMail('Confirmação de conta', $message));
+            $message = view('mail.confirmEmail', $data)->render();
+
+            Mail::to($this->email)->send(new SendMail('Confirmação de conta', $message));
+
+        } catch (Exception $e) {}
     }
 
     public function sendForgotPassword()
     {
-        $location = Location::get($_SERVER['REMOTE_ADDR']);
+        try {
 
-        $agent = new Agent();
+            $location = Location::get($_SERVER['REMOTE_ADDR']);
 
-        $data = [
-            'user' => $this,
-            'location' => $location ? "$location->countryName, $location->cityName - $location->regionName" : null,
-            'device' => $agent->device(),
-            'platform' => $agent->platform(),
-            'browser' => $agent->browser(),
-            'ip' => $_SERVER['REMOTE_ADDR']
-        ];
+            $agent = new Agent();
 
-        $message = view('mail.forgotPassword', $data)->render();
+            $data = [
+                'user' => $this,
+                'location' => $location ? "$location->countryName, $location->cityName - $location->regionName" : null,
+                'device' => $agent->device(),
+                'platform' => $agent->platform(),
+                'browser' => $agent->browser(),
+                'ip' => $_SERVER['REMOTE_ADDR']
+            ];
 
-        Mail::to($this->email)->send(new SendMail('Recuperação de senha', $message));
+            $message = view('mail.forgotPassword', $data)->render();
+
+            Mail::to($this->email)->send(new SendMail('Recuperação de senha', $message));
+
+        } catch (Exception $e) {}
     }
 
     public function sendNewPassword()
     {
-        $new_password = generatePasswd();
+        try {
 
-        $this->password = bcrypt($new_password);
+            $new_password = generatePasswd();
 
-        $this->save();
+            $this->password = bcrypt($new_password);
 
-        $data = [
-            'user' => $this,
-            'new_password' => $new_password
-        ];
+            $this->save();
 
-        $message = view('mail.newPassword', $data)->render();
+            $data = [
+                'user' => $this,
+                'new_password' => $new_password
+            ];
 
-        Mail::to($this->email)->send(new SendMail('Nova senha', $message));
+            $message = view('mail.newPassword', $data)->render();
+
+            Mail::to($this->email)->send(new SendMail('Nova senha', $message));
+
+        } catch (Exception $e) {}
     }
 
     public function confirmateAccount()

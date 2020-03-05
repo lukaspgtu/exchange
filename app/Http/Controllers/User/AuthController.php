@@ -153,7 +153,7 @@ class AuthController extends Controller
 
         $user->createId();
 
-        // $user->createWalletBTC();
+        $user->createWalletBTC();
 
         $user->createTwofactorKey();
 

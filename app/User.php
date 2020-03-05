@@ -12,6 +12,7 @@ use App\Mail\SendMail;
 use Google2FA;
 use Location;
 use AjaxJSON;
+use Exception;
 use JWTAuth;
 
 class User extends Authenticatable implements JWTSubject
@@ -55,22 +56,25 @@ class User extends Authenticatable implements JWTSubject
 
     public function createWalletBTC()
     {
-        if ($this->wallet_BTC == null) {
+        try {
 
-            $ajaxJSON = new AjaxJSON();
+            if ($this->wallet_BTC == null) {
 
-            $ajaxJSON->setHeaders(['Auth' => env('PROSYSTEM_API_GUID')]);
+                $ajaxJSON = new AjaxJSON();
 
-            $res = $ajaxJSON->post('https://api.prosystemsc.com/bitcoin/create');
+                $ajaxJSON->setHeaders(['Auth' => env('PROSYSTEM_API_GUID')]);
 
-            if ($res->success) {
+                $res = $ajaxJSON->post('https://api.prosystemsc.com/bitcoin/create');
 
-                $this->wallet_BTC = $res->address;
+                if ($res->success) {
+
+                    $this->wallet_BTC = $res->address;
+
+                }
 
             }
 
-        }
-
+        } catch (Exception $e) {}
     }
 
     public function createTwofactorKey()

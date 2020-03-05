@@ -369,15 +369,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function activateAccount($id)
+    public function activateAccount(User $user)
     {
-        $user = User::where('id', $id)->first();
-
-        if ($user == null) {
-
-            return abort(404);
-        }
-
         $user->confirmateAccount();
 
         return Redirect::to('http://broker.proexbit.com');

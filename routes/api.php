@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 # Auth Routes
-Route::get('activateAccount/{id}', 'User\AuthController@activateAccount')->name('activateAccount');
+Route::get('activateAccount/{user}', 'User\AuthController@activateAccount')->name('activateAccount');
 Route::get('orderStreaming', 'User\OrderController@orderStreaming');
 Route::post('verifyEmail', 'User\AuthController@verifyEmail');
 Route::post('verifyDocumentNumber', 'User\AuthController@verifyDocumentNumber');

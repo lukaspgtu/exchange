@@ -83,6 +83,11 @@ Route::prefix('admin')->group(function () {
             # Google2FA Routes
             Route::get('qrcode2FA', 'Admin\Google2FAController@qrcode2FA');
             Route::post('verify2FA', 'Admin\Google2FAController@verify2FA');
+
+            # Users Routes
+            Route::get('users', 'Admin\UserController@users');
+            Route::get('user/{id}', 'Admin\UserController@user');
+
         });
     });
 });

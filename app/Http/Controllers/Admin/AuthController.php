@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -101,5 +102,15 @@ class AuthController extends Controller
                 'message' => 'Senha Incorreta!',
             ]);
         }
+    }
+
+    public function auth()
+    {
+        $user = Auth::user();
+
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
     }
 }

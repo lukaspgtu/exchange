@@ -64,9 +64,7 @@ Route::group(['middleware' => 'assign.guard:users'], function () {
         Route::get('buyFeeExtracts', 'User\ExtractController@buyFeeExtracts');
         Route::get('saleExtracts', 'User\ExtractController@saleExtracts');
         Route::get('saleFeeExtracts', 'User\ExtractController@saleFeeExtracts');
-
     });
-
 });
 
 # Admin Routes
@@ -79,12 +77,12 @@ Route::prefix('admin')->group(function () {
 
         Route::group(['middleware' => 'auth.jwt'], function () {
 
+            # Auth Routes
+            Route::get('auth', 'Admin\AuthController@auth');
+
             # Google2FA Routes
             Route::get('qrcode2FA', 'Admin\Google2FAController@qrcode2FA');
             Route::post('verify2FA', 'Admin\Google2FAController@verify2FA');
-
         });
-
     });
-
 });

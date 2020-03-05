@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 # Auth Routes
+Route::get('activateAccount/{id}', 'User\AuthController@activateAccount')->name('activateAccount');
 Route::get('orderStreaming', 'User\OrderController@orderStreaming');
 Route::post('verifyEmail', 'User\AuthController@verifyEmail');
 Route::post('verifyDocumentNumber', 'User\AuthController@verifyDocumentNumber');
@@ -23,7 +24,6 @@ Route::put('generateNewPassword', 'User\AuthController@generateNewPassword');
 
 Route::group(['middleware' => 'assign.guard:users'], function () {
 
-    Route::get('activateAccount/{id}', 'User\AuthController@activateAccount');
     Route::post('login', 'User\AuthController@login');
     Route::post('loginTwoFactor', 'User\AuthController@loginTwoFactor');
 

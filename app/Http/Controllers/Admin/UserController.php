@@ -10,7 +10,7 @@ class UserController extends Controller
 {
     public function users()
     {
-        $users = User::select('id', 'name', 'email', 'document_type', 'document_number', 'created_at')
+        $users = User::select('id', 'name', 'email', 'account_type', 'document_number', 'created_at')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -22,6 +22,9 @@ class UserController extends Controller
 
     public function user(User $user)
     {
-        dd($user);
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
     }
 }

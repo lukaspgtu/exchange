@@ -15,11 +15,9 @@ class TickerController extends Controller
 
         $res = $ajaxJSON->get('https://ticker.proexbit.com');
 
-        dd($res->data);
-
         HistoryTicker::create([
-            'usd' => $res['data']['USD'],
-            'btc' => $res['data']['BTC']
+            'usd' => $res->data->USD,
+            'btc' => $res->data->BTC
         ]);
 
         return response()->json([

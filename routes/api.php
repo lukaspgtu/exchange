@@ -91,3 +91,9 @@ Route::prefix('admin')->group(function () {
         });
     });
 });
+
+Route::prefix('cron')->group(function () {
+
+    Route::get('setHistory', 'Cron\TickerController@setHistory');
+
+});

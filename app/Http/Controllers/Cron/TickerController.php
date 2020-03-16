@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Cron;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use AjaxJSON;
+use App\Utils\AjaxJSON;
 use App\HistoryTicker;
 
 class TickerController extends Controller
@@ -13,11 +13,11 @@ class TickerController extends Controller
     {
         $ajaxJSON = new AjaxJSON();
 
-        $res = $ajaxJSON->get('https://ticker.proexbit.com');
+        $res = $ajaxJSON->get('https://api.prosystemsc.com/ticker');
 
         HistoryTicker::create([
-            'usd' => $res->data->USD,
-            'btc' => $res->data->BTC
+            'usd' => $res->rates->USDCBRL,
+            'btc' => $res->rates->BITCOIN
         ]);
 
         return response()->json([

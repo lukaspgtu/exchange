@@ -449,7 +449,7 @@ class Order extends Model
 
         $ClientConfig->setHeaders(['Authorization' => env('WEB_SOCKET_AUTH')]);
 
-        $client = new WebSocketClient('ws://192.168.0.35:3000', $ClientConfig);
+        $client = new WebSocketClient('wss://socket.proexbit.com', $ClientConfig);
 
         $client->send(json_encode([
             'type' => 'buys',
@@ -465,7 +465,7 @@ class Order extends Model
 
         $ClientConfig->setHeaders(['Authorization' => env('WEB_SOCKET_AUTH')]);
 
-        $client = new WebSocketClient('ws://192.168.0.35:3000', $ClientConfig);
+        $client = new WebSocketClient('wss://socket.proexbit.com', $ClientConfig);
 
         $client->send(json_encode([
             'type' => 'sales',
@@ -481,7 +481,7 @@ class Order extends Model
 
         $ClientConfig->setHeaders(['Authorization' => env('WEB_SOCKET_AUTH')]);
 
-        $client = new WebSocketClient('ws://192.168.0.35:3000', $ClientConfig);
+        $client = new WebSocketClient('wss://socket.proexbit.com', $ClientConfig);
 
         $client->send(json_encode([
             'type' => 'executeds',

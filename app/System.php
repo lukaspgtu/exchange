@@ -22,6 +22,20 @@ class System extends Model
         'id'
     ];
 
+    public static function minAmountBuy()
+    {
+        $system = System::first();
+
+        return $system->min_amount_buy;
+    }
+
+    public static function minAmountSale()
+    {
+        $system = System::first();
+
+        return $system->min_amount_sale;
+    }
+
     public static function marketBuyFee()
     {
         $system = System::first();

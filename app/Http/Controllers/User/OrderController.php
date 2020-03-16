@@ -74,9 +74,20 @@ class OrderController extends Controller
     public function buy(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:25',
-            'unit_price' => 'required|numeric|min:0.01',
+            'amount' => 'required|numeric',
+            'unit_price' => 'required|numeric',
         ]);
+
+        $min_amount = System::minAmountBuy();
+
+        if ($request->amount < $min_amount) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Valor mínimo deve ser maior ou igual a R$ ' . number_format($min_amount, 2, ',', '.')
+            ]);
+
+        }
 
         $user = Auth::user();
 
@@ -117,9 +128,20 @@ class OrderController extends Controller
     public function sale(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:25',
-            'unit_price' => 'required|numeric|min:0.01',
+            'amount' => 'required|numeric',
+            'unit_price' => 'required|numeric',
         ]);
+
+        $min_amount = System::minAmountSale();
+
+        if ($request->amount * $request->unit_price < $min_amount) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Altere a quantidade ou preço unitário para que o total a receber seja maior ou igual a R$ ' . number_format($min_amount, 2, ',', '.')
+            ]);
+
+        }
 
         $user = Auth::user();
 

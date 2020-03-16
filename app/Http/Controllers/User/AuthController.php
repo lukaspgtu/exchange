@@ -395,4 +395,13 @@ class AuthController extends Controller
             ]
         ]);
     }
+
+    public function test(Request $request)
+    {
+        $request->validate([
+            'value' => 'required|numeric|min:25'
+        ]);
+
+        dd($request->value);
+    }
 }

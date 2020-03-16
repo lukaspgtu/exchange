@@ -22,6 +22,8 @@ Route::post('register', 'User\AuthController@register');
 Route::post('forgotPassword', 'User\AuthController@forgotPassword');
 Route::put('generateNewPassword', 'User\AuthController@generateNewPassword');
 
+Route::post('test', 'User\AuthController@test');
+
 Route::group(['middleware' => 'assign.guard:users'], function () {
 
     Route::post('login', 'User\AuthController@login');

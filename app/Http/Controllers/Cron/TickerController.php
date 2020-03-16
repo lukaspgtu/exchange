@@ -25,4 +25,9 @@ class TickerController extends Controller
             'message' => 'Histórico criado com sucesso!'
         ]);
     }
+
+    public function test()
+    {
+        dd(date('Y-m-d H:i:s'));
+    }
 }

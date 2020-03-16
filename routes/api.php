@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('test', 'Cron\TickerController@test');
+
 # Auth Routes
 Route::get('activateAccount/{user}', 'User\AuthController@activateAccount')->name('activateAccount');
 Route::get('orderStreaming', 'User\OrderController@orderStreaming');

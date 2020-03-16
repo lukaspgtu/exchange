@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class System extends Model
 {
@@ -23,23 +22,83 @@ class System extends Model
         'id'
     ];
 
-    public static function bitcoinBuy()
+    public static function marketBuyFee()
     {
-        return DB::table('system')->first()->bitcoin_buy;
+        $system = System::first();
+
+        return $system->market_buy_fee;
     }
 
-    public static function bitcoinSale()
+    public static function marketSaleFee()
     {
-        return DB::table('system')->first()->bitcoin_sale;
+        $system = System::first();
+
+        return $system->market_sale_fee;
     }
 
-    public static function feeBuy()
+    public static function platformBuyFee()
     {
-        return DB::table('system')->first()->fee_buy;
+        $system = System::first();
+
+        return $system->platform_buy_fee;
     }
 
-    public static function feeSale()
+    public static function platformSaleFee()
     {
-        return DB::table('system')->first()->fee_sale;
+        $system = System::first();
+
+        return $system->platform_sale_fee;
+    }
+
+    public static function marketBuyPrice()
+    {
+        $system = System::first();
+
+        $ticker = HistoryTicker::last();
+
+        $brl = $ticker->usd * $ticker->btc;
+
+        $price = $brl + fee($brl, $system->market_buy_fee);
+
+        return $price;
+    }
+
+    public static function marketSalePrice()
+    {
+        $system = System::first();
+
+        $ticker = HistoryTicker::last();
+
+        $brl = $ticker->usd * $ticker->btc;
+
+        $price = $brl + fee($brl, $system->market_sale_fee);
+
+        return $price;
+    }
+
+    public static function platformBuyPrice()
+    {
+        $system = System::first();
+
+        $ticker = HistoryTicker::last();
+
+        $brl = $ticker->usd * $ticker->btc;
+
+        $price = $brl + fee($brl, $system->platform_buy_fee);
+
+        return $price;
+    }
+
+    public static function platformSalePrice()
+    {
+        $system = System::first();
+
+        $ticker = HistoryTicker::last();
+
+        $brl = $ticker->usd * $ticker->btc;
+
+        $price = $brl + fee($brl, $system->platform_sale_fee);
+
+        return $price;
     }
 }

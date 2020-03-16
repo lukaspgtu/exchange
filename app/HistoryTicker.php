@@ -13,4 +13,14 @@ class HistoryTicker extends Model
     protected $fillable = [
         'usd', 'btc'
     ];
+
+    public static function last()
+    {
+        return HistoryTicker::orderBy('created_at', 'desc')->first();
+    }
+
+    public static function last24H()
+    {
+
+    }
 }

@@ -227,7 +227,7 @@ class OrderController extends Controller
             $unit_price = formatReal($firstOrder->unit_price + 1.00);
 
         else
-            $unit_price = formatReal(System::bitcoinBuy());
+            $unit_price = formatReal(System::marketBuyPrice());
 
         $order = new Order([
             'amount' => $request->amount,
@@ -263,7 +263,7 @@ class OrderController extends Controller
             $unit_price = formatReal($firstOrder->unit_price - 1.00);
 
         else
-            $unit_price = formatReal(System::bitcoinBuy());
+            $unit_price = formatReal(System::marketSalePrice());
 
         $order = new Order([
             'amount' => $request->amount,

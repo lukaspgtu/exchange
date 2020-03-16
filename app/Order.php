@@ -92,7 +92,7 @@ class Order extends Model
 
             $value = real_to_satoshi($this->amount, $this->unit_price);
 
-            $this->fee = formatSatoshi(fee($value, System::feeSale()));
+            $this->fee = formatSatoshi(fee($value, System::marketBuyFee()));
 
         }
 
@@ -100,7 +100,7 @@ class Order extends Model
 
             $value = satoshi_to_real($this->amount, $this->unit_price);
 
-            $this->fee = formatReal(fee($value, System::feeSale()));
+            $this->fee = formatReal(fee($value, System::marketSaleFee()));
 
         }
     }

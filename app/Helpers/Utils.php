@@ -225,7 +225,7 @@ if (!function_exists('variation')) {
 
     function variation($value, $base)
     {
-        $variation = 100 - (($value * 100) / $base);
+        $variation = (($value * 100) / $base) - 100;
 
         return round($variation, 2);
     }

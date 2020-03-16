@@ -37,7 +37,7 @@ class HistoryTicker extends Model
 
             if ($key > 0) {
 
-                $data = [
+                $data[] = [
                     'value' => $value,
                     'variation' => variation($value, $base),
                     'created_at' => $ticker->created_at
@@ -46,7 +46,7 @@ class HistoryTicker extends Model
 
             else {
 
-                $data = [
+                $data[] = [
                     'value' => $value,
                     'created_at' => $ticker->created_at
                 ];
@@ -74,7 +74,7 @@ class HistoryTicker extends Model
 
             if ($key > 0) {
 
-                $data = [
+                $data[] = [
                     'value' => $value,
                     'variation' => variation($value, $base),
                     'created_at' => $ticker->created_at
@@ -83,7 +83,7 @@ class HistoryTicker extends Model
 
             else {
 
-                $data = [
+                $data[] = [
                     'value' => $value,
                     'created_at' => $ticker->created_at
                 ];
@@ -111,7 +111,7 @@ class HistoryTicker extends Model
 
             if ($key > 0) {
 
-                $data = [
+                $data[] = [
                     'value' => $value,
                     'variation' => variation($value, $base),
                     'created_at' => $ticker->created_at
@@ -120,7 +120,7 @@ class HistoryTicker extends Model
 
             else {
 
-                $data = [
+                $data[] = [
                     'value' => $value,
                     'created_at' => $ticker->created_at
                 ];
@@ -148,7 +148,7 @@ class HistoryTicker extends Model
 
             if ($key > 0) {
 
-                $data = [
+                $data[] = [
                     'value' => $value,
                     'variation' => variation($value, $base),
                     'created_at' => $ticker->created_at
@@ -157,7 +157,7 @@ class HistoryTicker extends Model
 
             else {
 
-                $data = [
+                $data[] = [
                     'value' => $value,
                     'created_at' => $ticker->created_at
                 ];

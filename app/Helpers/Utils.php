@@ -220,3 +220,13 @@ if (!function_exists('removeSymbols')) {
         return preg_replace('/[^0-9]/', '', $string);
     }
 }
+
+if (!function_exists('variation')) {
+
+    function variation($value, $base)
+    {
+        $variation = 100 - (($value * 100) / $base);
+
+        return round($variation, 2);
+    }
+}

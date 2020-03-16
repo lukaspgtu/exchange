@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('test', 'Cron\TickerController@test');
-
 # Auth Routes
 Route::get('activateAccount/{user}', 'User\AuthController@activateAccount')->name('activateAccount');
 Route::get('orderStreaming', 'User\OrderController@orderStreaming');
@@ -66,6 +64,13 @@ Route::group(['middleware' => 'assign.guard:users'], function () {
         Route::get('buyFeeExtracts', 'User\ExtractController@buyFeeExtracts');
         Route::get('saleExtracts', 'User\ExtractController@saleExtracts');
         Route::get('saleFeeExtracts', 'User\ExtractController@saleFeeExtracts');
+
+        # History Ticker Routes
+        Route::get('history24H', 'User\HistoryTickerController@history24H');
+        Route::get('history1M', 'User\HistoryTickerController@history1M');
+        Route::get('history3M', 'User\HistoryTickerController@history3M');
+        Route::get('history1Y', 'User\HistoryTickerController@history1Y');
+
     });
 });
 

@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 
 class ExtractController extends Controller
 {
     public function allExtracts()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $extracts = $user->getExtracts();
 
@@ -21,7 +22,7 @@ class ExtractController extends Controller
 
     public function buyExtracts()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $extracts = $user->getExtractsByType(BUY);
 
@@ -33,7 +34,7 @@ class ExtractController extends Controller
 
     public function buyFeeExtracts()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $extracts = $user->getExtractsByType(BUY_FEE);
 
@@ -45,7 +46,7 @@ class ExtractController extends Controller
 
     public function saleExtracts()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $extracts = $user->getExtractsByType(SALE);
 
@@ -57,7 +58,7 @@ class ExtractController extends Controller
 
     public function saleFeeExtracts()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $extracts = $user->getExtractsByType(SALE_FEE);
 

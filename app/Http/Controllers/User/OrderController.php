@@ -5,17 +5,15 @@ namespace App\Http\Controllers\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Order;
-use App\Rules\OrderPrice;
-use App\Rules\OrderAmount;
-use App\Rules\OrderValue;
 use App\System;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
     public function allOrders()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $orders = $user->getOrders();
 
@@ -27,7 +25,7 @@ class OrderController extends Controller
 
     public function ordersCanceled()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $orders = $user->getOrdersByStatus(CANCELED);
 
@@ -39,7 +37,7 @@ class OrderController extends Controller
 
     public function ordersExecuted()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $orders = $user->getOrdersByStatus(EXECUTED);
 
@@ -51,7 +49,7 @@ class OrderController extends Controller
 
     public function ordersRunning()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $orders = $user->getOrdersByStatus(RUNNING);
 
@@ -63,7 +61,7 @@ class OrderController extends Controller
 
     public function ordersWaiting()
     {
-        $user = Auth::user();
+        $user = User::find(Auth::id());
 
         $orders = $user->getOrdersByStatus(WAITING);
 
@@ -76,8 +74,8 @@ class OrderController extends Controller
     public function buy(Request $request)
     {
         $request->validate([
-            'amount' => ['required', new OrderValue],
-            'unit_price' => ['required', new OrderPrice]
+            'amount' => 'required|numeric|min:25',
+            'unit_price' => 'required|numeric|min:0.01',
         ]);
 
         $user = Auth::user();
@@ -119,8 +117,8 @@ class OrderController extends Controller
     public function sale(Request $request)
     {
         $request->validate([
-            'amount' => ['required', new OrderAmount],
-            'unit_price' => ['required', new OrderPrice]
+            'amount' => 'required|numeric|min:25',
+            'unit_price' => 'required|numeric|min:0.01',
         ]);
 
         $user = Auth::user();
@@ -162,8 +160,8 @@ class OrderController extends Controller
     public function buyLimitedPrice(Request $request)
     {
         $request->validate([
-            'amount' => 'required',
-            'unit_price' => 'required'
+            'amount' => 'required|numeric',
+            'unit_price' => 'required|numeric',
         ]);
 
         $order = new Order([
@@ -188,8 +186,8 @@ class OrderController extends Controller
     public function saleLimitedPrice(Request $request)
     {
         $request->validate([
-            'amount' => 'required',
-            'unit_price' => 'required'
+            'amount' => 'required|numeric',
+            'unit_price' => 'required|numeric',
         ]);
 
         $order = new Order([
@@ -216,7 +214,7 @@ class OrderController extends Controller
     public function buyMarketPrice(Request $request)
     {
         $request->validate([
-            'amount' => 'required'
+            'amount' => 'required|numeric'
         ]);
 
         $firstOrder = Order::where('type', 'buy')
@@ -252,7 +250,7 @@ class OrderController extends Controller
     public function saleMarketPrice(Request $request)
     {
         $request->validate([
-            'amount' => 'required'
+            'amount' => 'required|numeric'
         ]);
 
         $firstOrder = Order::where('type', 'sale')

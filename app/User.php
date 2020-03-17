@@ -293,7 +293,7 @@ class User extends Authenticatable implements JWTSubject
                     ->orderBy('created_at', 'desc')
                     ->get();
 
-            case EXECUTED:
+            case CONFIRMED:
 
                 return Order::selectRaw($raw)
                     ->where('user_id', $this->id)

@@ -1,27 +1,46 @@
 <?php
 
-defined('BUY') OR define('BUY', 'buy');
+# ORDER TYPE AND PLATFORM MARKET TYPE
 
-defined('BUY_FEE') OR define('BUY_FEE', 'buy_fee');
+defined('BUY') OR define('BUY', 1);
 
-defined('SALE') OR define('SALE', 'sale');
+defined('SALE') OR define('SALE', 2);
 
-defined('SALE_FEE') OR define('SALE_FEE', 'sale_fee');
+defined('BUY_FEE') OR define('BUY_FEE', 3);
 
-defined('WAITING') OR define('WAITING', 'waiting');
+defined('SALE_FEE') OR define('SALE_FEE', 4);
 
-defined('RUNNING') OR define('RUNNING', 'running');
+# ACCOUNT TYPE
 
-defined('EXECUTED') OR define('EXECUTED', 'executed');
+defined('FISICAL') OR define('FISICAL', 1);
 
-defined('CANCELED') OR define('CANCELED', 'canceled');
+defined('LEGAL') OR define('LEGAL', 2);
 
-defined('CONFIRMED') OR define('CONFIRMED', 'confirmed');
+defined('FOREIGN') OR define('FOREIGN', 3);
+
+# STATUS
+
+defined('WAITING') OR define('WAITING', 0);
+
+defined('CONFIRMED') OR define('CONFIRMED', 1);
+
+defined('CANCELED') OR define('CANCELED', 2);
+
+defined('RUNNING') OR define('RUNNING', 3);
+
+# GAIN
+
+defined('GAIN_ORDER') OR define('GAIN_ORDER', 1);
+
+defined('GAIN_TICKER') OR define('GAIN_TICKER', 2);
+
+
+# DESCRIPTION
 
 defined('BUY_DESCRIPTION') OR define('BUY_DESCRIPTION', 'Compra');
 
-defined('BUY_FEE_DESCRIPTION') OR define('BUY_FEE_DESCRIPTION', 'Taxa sobre compra');
-
 defined('SALE_DESCRIPTION') OR define('SALE_DESCRIPTION', 'Venda');
+
+defined('BUY_FEE_DESCRIPTION') OR define('BUY_FEE_DESCRIPTION', 'Taxa sobre compra');
 
 defined('SALE_FEE_DESCRIPTION') OR define('SALE_FEE_DESCRIPTION', 'Taxa sobre venda');

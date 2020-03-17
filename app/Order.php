@@ -26,7 +26,7 @@ class Order extends Model
      */
     protected $attributes = [
         'processed' => 0.00,
-        'status' => 'opened'
+        'status' =>
     ];
 
     /**
@@ -267,7 +267,7 @@ class Order extends Model
 
         foreach ($sales as $sale) {
 
-            if ($this->status == EXECUTED) break;
+            if ($this->status == CONFIRMED) break;
 
             $sale_amount = $sale->amount - $sale->processed;
 
@@ -334,6 +334,7 @@ class Order extends Model
                     Gain::create([
                         'buy_id' => $this->id,
                         'sale_id' => $sale->id,
+                        'type' => GAIN_ORDER,
                         'value' => $value
                     ]);
 
@@ -359,7 +360,7 @@ class Order extends Model
 
         foreach ($buys as $buy) {
 
-            if ($this->status == EXECUTED) break;
+            if ($this->status == CONFIRMED) break;
 
             $buy_amount = real_to_satoshi($buy->amount - $buy->processed, $buy->unit_price);
 
@@ -426,6 +427,7 @@ class Order extends Model
                     Gain::create([
                         'buy_id' => $this->id,
                         'sale_id' => $buy->id,
+                        'type' => GAIN_ORDER,
                         'value' => $value
                     ]);
 

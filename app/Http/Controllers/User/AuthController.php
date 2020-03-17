@@ -122,13 +122,13 @@ class AuthController extends Controller
             'password' => 'required|string'
         ]);
 
-        if ($request->account_type == 'fisical') {
+        if ($request->account_type == FISICAL) {
 
             $request->validate([
                 'document_number' => [new CPF, 'unique:users']
             ]);
 
-        } elseif ($request->account_type == 'legal') {
+        } elseif ($request->account_type == LEGAL) {
 
             $request->validate([
                 'document_number' => [new CNPJ, 'unique:users']

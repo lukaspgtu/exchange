@@ -30,6 +30,14 @@ if (!function_exists('real_to_satoshi')) {
     }
 }
 
+if (!function_exists('real_to_bitcoin')) {
+
+    function real_to_bitcoin($real, $price)
+    {
+        return round(($real / $price), 8);
+    }
+}
+
 if (!function_exists('satoshi_to_bitcoin')) {
 
     function satoshi_to_bitcoin($satoshi)

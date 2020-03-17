@@ -72,7 +72,7 @@ class System extends Model
 
         $brl = $ticker->usd * $ticker->btc;
 
-        $price = $brl + fee($brl, $system->market_buy_fee);
+        $price = $brl + fee($brl, $system->market_buy_price);
 
         return $price;
     }
@@ -85,7 +85,7 @@ class System extends Model
 
         $brl = $ticker->usd * $ticker->btc;
 
-        $price = $brl + fee($brl, $system->market_sale_fee);
+        $price = $brl - fee($brl, $system->market_sale_price);
 
         return $price;
     }
@@ -98,7 +98,7 @@ class System extends Model
 
         $brl = $ticker->usd * $ticker->btc;
 
-        $price = $brl + fee($brl, $system->platform_buy_fee);
+        $price = $brl + fee($brl, $system->platform_buy_price);
 
         return $price;
     }
@@ -111,7 +111,7 @@ class System extends Model
 
         $brl = $ticker->usd * $ticker->btc;
 
-        $price = $brl + fee($brl, $system->platform_sale_fee);
+        $price = $brl - fee($brl, $system->platform_sale_price);
 
         return $price;
     }

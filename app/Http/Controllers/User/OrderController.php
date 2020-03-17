@@ -39,7 +39,7 @@ class OrderController extends Controller
     {
         $user = User::find(Auth::id());
 
-        $orders = $user->getOrdersByStatus(EXECUTED);
+        $orders = $user->getOrdersByStatus(CONFIRMED);
 
         return response()->json([
             'success' => true,

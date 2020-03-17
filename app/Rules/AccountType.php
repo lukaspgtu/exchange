@@ -25,7 +25,7 @@ class AccountType implements Rule
      */
     public function passes($attribute, $value)
     {
-        if ($value == 'fisical' || $value == 'legal' || $value == 'foreign')
+        if ($value == FISICAL || $value == LEGAL || $value == FOREIGN)
             return true;
 
         return false;

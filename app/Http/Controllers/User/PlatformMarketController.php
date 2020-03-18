@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\HistoryTicker;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\PlatformMarket;
@@ -16,7 +17,9 @@ class PlatformMarketController extends Controller
             'amount' => 'required|numeric'
         ]);
 
-        $unit_price = System::platformBuyPrice();
+        $ticker = HistoryTicker::last();
+
+        $unit_price = $ticker->platform_buy_price;
 
         $platformMarket = new PlatformMarket([
             'amount' => $request->amount,
@@ -46,7 +49,9 @@ class PlatformMarketController extends Controller
             'amount' => 'required|numeric'
         ]);
 
-        $unit_price = System::platformSalePrice();
+        $ticker = HistoryTicker::last();
+
+        $unit_price = $ticker->platform_sale_price;
 
         $platformMarket = new PlatformMarket([
             'amount' => $request->amount,
@@ -76,7 +81,9 @@ class PlatformMarketController extends Controller
             'amount' => 'required|numeric'
         ]);
 
-        $unit_price = System::platformBuyPrice();
+        $ticker = HistoryTicker::last();
+
+        $unit_price = $ticker->platform_buy_price;
 
         $platformMarket = new PlatformMarket([
             'user_id' => Auth::id(),
@@ -103,7 +110,9 @@ class PlatformMarketController extends Controller
             'amount' => 'required|numeric'
         ]);
 
-        $unit_price = System::platformSalePrice();
+        $ticker = HistoryTicker::last();
+
+        $unit_price = $ticker->platform_sale_price;
 
         $platformMarket = new PlatformMarket([
             'user_id' => Auth::id(),

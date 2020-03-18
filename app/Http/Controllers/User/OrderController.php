@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\HistoryTicker;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Order;
@@ -243,11 +244,19 @@ class OrderController extends Controller
             ->where('position', 1)
             ->first();
 
-        if ($firstOrder != null)
+        if ($firstOrder != null) {
+
             $unit_price = formatReal($firstOrder->unit_price + 1.00);
 
-        else
-            $unit_price = formatReal(System::marketBuyPrice());
+        }
+
+        else {
+
+            $ticker = HistoryTicker::last();
+
+            $unit_price = formatReal($ticker->market_buy_price);
+
+        }
 
         $order = new Order([
             'amount' => $request->amount,
@@ -279,11 +288,19 @@ class OrderController extends Controller
             ->where('position', 1)
             ->first();
 
-        if ($firstOrder != null)
+        if ($firstOrder != null) {
+
             $unit_price = formatReal($firstOrder->unit_price - 1.00);
 
-        else
-            $unit_price = formatReal(System::marketSalePrice());
+        }
+
+        else {
+
+            $ticker = HistoryTicker::last();
+
+            $unit_price = formatReal($ticker->market_sale_price);
+
+        }
 
         $order = new Order([
             'amount' => $request->amount,

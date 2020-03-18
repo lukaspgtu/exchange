@@ -85,13 +85,13 @@ class PlatformMarketController extends Controller
 
         $platformMarket->tax();
 
-        $fee = satoshi_to_bitcoin($platformMarket->fee);
+        $platformMarket->setTickerEarning();
 
-        // Calcular ticker earning
+        $platformMarket->save();
 
         return response()->json([
             'success' => true,
-            'message' => ''
+            'message' => 'Compra realizada com sucesso!'
         ]);
     }
 
@@ -112,11 +112,13 @@ class PlatformMarketController extends Controller
 
         $platformMarket->tax();
 
-        // Calcular ticker earning
+        $platformMarket->setTickerEarning();
+
+        $platformMarket->save();
 
         return response()->json([
             'success' => true,
-            'message' => ''
+            'message' => 'Venda realizada com sucesso!'
         ]);
     }
 }

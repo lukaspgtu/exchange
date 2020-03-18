@@ -88,11 +88,13 @@ class Order extends Model
 
     public function tax()
     {
+        $settings = System::settings();
+
         if ($this->type == 'buy') {
 
             $value = real_to_satoshi($this->amount, $this->unit_price);
 
-            $this->fee = formatSatoshi(fee($value, System::marketBuyFee()));
+            $this->fee = formatSatoshi(fee($value, $settings->market_buy_fee));
 
         }
 
@@ -100,7 +102,7 @@ class Order extends Model
 
             $value = satoshi_to_real($this->amount, $this->unit_price);
 
-            $this->fee = formatReal(fee($value, System::marketSaleFee()));
+            $this->fee = formatReal(fee($value, $settings->market_sale_fee));
 
         }
     }

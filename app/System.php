@@ -22,46 +22,9 @@ class System extends Model
         'id'
     ];
 
-    public static function minAmountBuy()
+    public static function settings()
     {
-        $system = System::first();
-
-        return $system->min_amount_buy;
-    }
-
-    public static function minAmountSale()
-    {
-        $system = System::first();
-
-        return $system->min_amount_sale;
-    }
-
-    public static function marketBuyFee()
-    {
-        $system = System::first();
-
-        return $system->market_buy_fee;
-    }
-
-    public static function marketSaleFee()
-    {
-        $system = System::first();
-
-        return $system->market_sale_fee;
-    }
-
-    public static function platformBuyFee()
-    {
-        $system = System::first();
-
-        return $system->platform_buy_fee;
-    }
-
-    public static function platformSaleFee()
-    {
-        $system = System::first();
-
-        return $system->platform_sale_fee;
+        return System::first();
     }
 
     public static function marketBuyPrice()

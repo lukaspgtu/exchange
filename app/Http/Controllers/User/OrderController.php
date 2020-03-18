@@ -78,13 +78,13 @@ class OrderController extends Controller
             'unit_price' => 'required|numeric',
         ]);
 
-        $min_amount = System::minAmountBuy();
+        $settings = System::settings();
 
-        if ($request->amount < $min_amount) {
+        if ($request->amount < $settings->min_amount_buy) {
 
             return response()->json([
                 'success' => false,
-                'message' => 'Valor mínimo deve ser maior ou igual a R$ ' . number_format($min_amount, 2, ',', '.')
+                'message' => 'Valor mínimo deve ser maior ou igual a R$ ' . number_format($settings->min_amount_buy, 2, ',', '.')
             ]);
 
         }
@@ -132,13 +132,13 @@ class OrderController extends Controller
             'unit_price' => 'required|numeric',
         ]);
 
-        $min_amount = System::minAmountSale();
+        $settings = System::settings();
 
-        if ($request->amount * $request->unit_price < $min_amount) {
+        if ($request->amount * $request->unit_price < $settings->min_amount_sale) {
 
             return response()->json([
                 'success' => false,
-                'message' => 'Altere a quantidade ou preço unitário para que o total a receber seja maior ou igual a R$ ' . number_format($min_amount, 2, ',', '.')
+                'message' => 'Altere a quantidade ou preço unitário para que o total a receber seja maior ou igual a R$ ' . number_format($settings->min_amount_sale, 2, ',', '.')
             ]);
 
         }

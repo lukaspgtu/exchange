@@ -44,6 +44,12 @@ Route::group(['middleware' => 'assign.guard:users'], function () {
         Route::get('qrcode2FA', 'User\Google2FAController@qrcode2FA');
         Route::post('verify2FA', 'User\Google2FAController@verify2FA');
 
+        # Platform Market Routes
+        Route::post('platformMarketSimulateBuy', 'User\PlatformMarketController@simulateBuy');
+        Route::post('platformMarketSimulateSale', 'User\PlatformMarketController@simulateSale');
+        Route::post('platformMarketBuy', 'User\PlatformMarketController@buy');
+        Route::post('platformMarketSale', 'User\PlatformMarketController@sale');
+
         # Order Routes
         Route::get('allOrders', 'User\OrderController@allOrders');
         Route::get('ordersCanceled', 'User\OrderController@ordersCanceled');

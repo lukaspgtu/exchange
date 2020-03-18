@@ -33,6 +33,7 @@ class PlatformMarketController extends Controller
         $total = $value - $fee;
 
         return response()->json([
+            'unit_price' => $unit_price,
             'value' => $value,
             'fee' => $fee,
             'total' => $total
@@ -62,6 +63,7 @@ class PlatformMarketController extends Controller
         $total = $value - $fee;
 
         return response()->json([
+            'unit_price' => $unit_price,
             'value' => $value,
             'fee' => $fee,
             'total' => $total

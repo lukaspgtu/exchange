@@ -29,17 +29,15 @@ class HistoryTicker extends Model
 
         $data = [];
 
-        $base = $history[0]->usd * $history[0]->btc;
-
         foreach ($history as $key => $ticker) {
-
-            $value = $ticker->usd * $ticker->btc;
 
             if ($key > 0) {
 
                 $data[] = [
-                    'value' => $value,
-                    'variation' => variation($value, $base),
+                    'buy_price' => $ticker->platform_buy_price,
+                    'buy_variation' => variation($ticker->platform_buy_price, $history[0]->platform_buy_price),
+                    'sale_price' => $ticker->platform_sale_price,
+                    'sale_variation' => variation($ticker->platform_sale_price, $history[0]->platform_sale_price),
                     'created_at' => $ticker->created_at
                 ];
             }
@@ -47,7 +45,8 @@ class HistoryTicker extends Model
             else {
 
                 $data[] = [
-                    'value' => $value,
+                    'buy_price' => $ticker->platform_buy_price,
+                    'sale_price' => $ticker->platform_sale_price,
                     'created_at' => $ticker->created_at
                 ];
             }
@@ -66,17 +65,15 @@ class HistoryTicker extends Model
 
         $data = [];
 
-        $base = $history[0]->usd * $history[0]->btc;
-
         foreach ($history as $key => $ticker) {
-
-            $value = $ticker->usd * $ticker->btc;
 
             if ($key > 0) {
 
                 $data[] = [
-                    'value' => $value,
-                    'variation' => variation($value, $base),
+                    'buy_price' => $ticker->platform_buy_price,
+                    'buy_variation' => variation($ticker->platform_buy_price, $history[0]->platform_buy_price),
+                    'sale_price' => $ticker->platform_sale_price,
+                    'sale_variation' => variation($ticker->platform_sale_price, $history[0]->platform_sale_price),
                     'created_at' => $ticker->created_at
                 ];
             }
@@ -84,7 +81,8 @@ class HistoryTicker extends Model
             else {
 
                 $data[] = [
-                    'value' => $value,
+                    'buy_price' => $ticker->platform_buy_price,
+                    'sale_price' => $ticker->platform_sale_price,
                     'created_at' => $ticker->created_at
                 ];
             }
@@ -103,17 +101,15 @@ class HistoryTicker extends Model
 
         $data = [];
 
-        $base = $history[0]->usd * $history[0]->btc;
-
         foreach ($history as $key => $ticker) {
-
-            $value = $ticker->usd * $ticker->btc;
 
             if ($key > 0) {
 
                 $data[] = [
-                    'value' => $value,
-                    'variation' => variation($value, $base),
+                    'buy_price' => $ticker->platform_buy_price,
+                    'buy_variation' => variation($ticker->platform_buy_price, $history[0]->platform_buy_price),
+                    'sale_price' => $ticker->platform_sale_price,
+                    'sale_variation' => variation($ticker->platform_sale_price, $history[0]->platform_sale_price),
                     'created_at' => $ticker->created_at
                 ];
             }
@@ -121,7 +117,8 @@ class HistoryTicker extends Model
             else {
 
                 $data[] = [
-                    'value' => $value,
+                    'buy_price' => $ticker->platform_buy_price,
+                    'sale_price' => $ticker->platform_sale_price,
                     'created_at' => $ticker->created_at
                 ];
             }
@@ -140,17 +137,15 @@ class HistoryTicker extends Model
 
         $data = [];
 
-        $base = $history[0]->usd * $history[0]->btc;
-
         foreach ($history as $key => $ticker) {
-
-            $value = $ticker->usd * $ticker->btc;
 
             if ($key > 0) {
 
                 $data[] = [
-                    'value' => $value,
-                    'variation' => variation($value, $base),
+                    'buy_price' => $ticker->platform_buy_price,
+                    'buy_variation' => variation($ticker->platform_buy_price, $history[0]->platform_buy_price),
+                    'sale_price' => $ticker->platform_sale_price,
+                    'sale_variation' => variation($ticker->platform_sale_price, $history[0]->platform_sale_price),
                     'created_at' => $ticker->created_at
                 ];
             }
@@ -158,7 +153,8 @@ class HistoryTicker extends Model
             else {
 
                 $data[] = [
-                    'value' => $value,
+                    'buy_price' => $ticker->platform_buy_price,
+                    'sale_price' => $ticker->platform_sale_price,
                     'created_at' => $ticker->created_at
                 ];
             }

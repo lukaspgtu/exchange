@@ -11,7 +11,7 @@ class HistoryTicker extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'usd', 'btc'
+        'market_buy_price', 'market_sale_price', 'platform_buy_price', 'platform_sale_price'
     ];
 
     public static function last()

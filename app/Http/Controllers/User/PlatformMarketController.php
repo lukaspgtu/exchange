@@ -26,7 +26,7 @@ class PlatformMarketController extends Controller
 
         $platformMarket->tax();
 
-        $value = real_to_bitcoin($request->amount, $request->unit_price);
+        $value = real_to_bitcoin($request->amount, $unit_price);
 
         $fee = satoshi_to_bitcoin($platformMarket->fee);
 
@@ -55,7 +55,7 @@ class PlatformMarketController extends Controller
 
         $platformMarket->tax();
 
-        $value = satoshi_to_real($this->amount, $this->unit_price);
+        $value = satoshi_to_real($request->amount, $unit_price);
 
         $fee = $platformMarket->fee;
 

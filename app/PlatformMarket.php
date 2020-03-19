@@ -62,9 +62,9 @@ class PlatformMarket extends Model
 
             $unit_price_without_increase = $this->unit_price - fee($this->unit_price, $settings->platform_buy_price);
 
-            $total_received = real_to_satoshi($this->amount, $this->unit_price) - $this->fee;
+            $total_received = real_to_satoshi($this->amount, $this->unit_price);
 
-            $total_without_increase = real_to_satoshi($this->amount, $unit_price_without_increase) - $this->fee;
+            $total_without_increase = real_to_satoshi($this->amount, $unit_price_without_increase);
 
             $total = $total_without_increase - $total_received;
 
@@ -74,9 +74,9 @@ class PlatformMarket extends Model
 
             $unit_price_without_increase = $this->unit_price + fee($this->unit_price, $settings->platform_sale_price);
 
-            $total_received = satoshi_to_real($this->amount, $this->unit_price) - $this->fee;
+            $total_received = satoshi_to_real($this->amount, $this->unit_price);
 
-            $total_without_increase = satoshi_to_real($this->amount, $unit_price_without_increase) - $this->fee;
+            $total_without_increase = satoshi_to_real($this->amount, $unit_price_without_increase);
 
             $total = $total_without_increase - $total_received;
 

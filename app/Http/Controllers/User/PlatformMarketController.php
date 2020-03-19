@@ -55,12 +55,12 @@ class PlatformMarketController extends Controller
         $platformMarket = new PlatformMarket([
             'amount' => bitcoin_to_satoshi($request->amount),
             'type' => SALE,
-            'unit_price' => $ticker->platform_buy_price
+            'unit_price' => $ticker->platform_sale_price
         ]);
 
         $platformMarket->tax();
 
-        $value = bitcoin_to_real($request->amount, $ticker->platform_buy_price);
+        $value = bitcoin_to_real($request->amount, $ticker->platform_sale_price);
 
         $fee = $platformMarket->fee;
 
@@ -69,7 +69,7 @@ class PlatformMarketController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'unit_price' => $ticker->platform_buy_price,
+                'unit_price' => $ticker->platform_sale_price,
                 'value' => $value,
                 'fee' => $fee,
                 'total' => $total

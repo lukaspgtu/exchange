@@ -92,7 +92,7 @@ class PlatformMarketController extends Controller
             'unit_price' => $ticker->platform_buy_price
         ]);
 
-        if (!$this->obeysMinimumPrice()) {
+        if (!$platformMarket->obeysMinimumPrice()) {
 
             $settings = System::settings();
 
@@ -103,7 +103,7 @@ class PlatformMarketController extends Controller
             ]);
         }
 
-        if (!$this->userHasBalance()) {
+        if (!$platformMarket->userHasBalance()) {
 
             return response()->json([
                 'success' => false,
@@ -140,7 +140,7 @@ class PlatformMarketController extends Controller
             'unit_price' => $ticker->platform_sale_price
         ]);
 
-        if (!$this->obeysMinimumPrice()) {
+        if (!$platformMarket->obeysMinimumPrice()) {
 
             $settings = System::settings();
 
@@ -151,7 +151,7 @@ class PlatformMarketController extends Controller
             ]);
         }
 
-        if (!$this->userHasBalance()) {
+        if (!$platformMarket->userHasBalance()) {
 
             return response()->json([
                 'success' => false,

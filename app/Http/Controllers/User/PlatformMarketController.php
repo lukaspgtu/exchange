@@ -19,17 +19,15 @@ class PlatformMarketController extends Controller
 
         $ticker = HistoryTicker::last();
 
-        $unit_price = $ticker->platform_buy_price;
-
         $platformMarket = new PlatformMarket([
             'amount' => $request->amount,
             'type' => BUY,
-            'unit_price' => $unit_price
+            'unit_price' => $ticker->platform_buy_price
         ]);
 
         $platformMarket->tax();
 
-        $value = real_to_bitcoin($request->amount, $unit_price);
+        $value = real_to_bitcoin($request->amount, $ticker->platform_buy_price);
 
         $fee = satoshi_to_bitcoin($platformMarket->fee);
 
@@ -38,7 +36,7 @@ class PlatformMarketController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'unit_price' => $unit_price,
+                'unit_price' => $ticker->platform_buy_price,
                 'value' => $value,
                 'fee' => $fee,
                 'total' => $total
@@ -54,17 +52,15 @@ class PlatformMarketController extends Controller
 
         $ticker = HistoryTicker::last();
 
-        $unit_price = $ticker->platform_sale_price;
-
         $platformMarket = new PlatformMarket([
-            'amount' => $request->amount,
+            'amount' => bitcoin_to_satoshi($request->amount),
             'type' => SALE,
-            'unit_price' => $unit_price
+            'unit_price' => $ticker->platform_buy_price
         ]);
 
         $platformMarket->tax();
 
-        $value = bitcoin_to_real($request->amount, $unit_price);
+        $value = bitcoin_to_real($request->amount, $ticker->platform_buy_price);
 
         $fee = $platformMarket->fee;
 
@@ -73,7 +69,7 @@ class PlatformMarketController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'unit_price' => $unit_price,
+                'unit_price' => $ticker->platform_buy_price,
                 'value' => $value,
                 'fee' => $fee,
                 'total' => $total

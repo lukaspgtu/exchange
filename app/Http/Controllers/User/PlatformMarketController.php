@@ -64,7 +64,7 @@ class PlatformMarketController extends Controller
 
         $settings = System::settings();
 
-        $value = bitcoin_to_real($this->amount, $this->unit_price);
+        $value = bitcoin_to_real($request->amount, $platformMarket->unit_price);
 
             return response()->json([
                 'value' => $value,

@@ -26,7 +26,7 @@ class PlatformMarket extends Model
 
         else {
 
-            $value = satoshi_to_real($this->amount, $this->unit_price);
+            $value = bitcoin_to_real($this->amount, $this->unit_price);
 
             $this->fee = formatReal(fee($value, $settings->platform_sale_fee));
 

@@ -54,6 +54,14 @@ if (!function_exists('bitcoin_to_satoshi')) {
     }
 }
 
+if (!function_exists('bitcoin_to_real')) {
+
+    function bitcoin_to_real($bitcoin, $price)
+    {
+        return round($bitcoin * $price, 2);
+    }
+}
+
 if (!function_exists('formatSatoshi')) {
 
     function formatSatoshi($value)

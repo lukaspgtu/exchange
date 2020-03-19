@@ -62,6 +62,16 @@ class PlatformMarketController extends Controller
             'unit_price' => $unit_price
         ]);
 
+        $settings = System::settings();
+
+        $value = bitcoin_to_real($this->amount, $this->unit_price);
+
+            return response()->json([
+                'value' => $value,
+                'sett' => $settings->platform_sale_fee,
+                'fee' => fee($value, $settings->platform_sale_fee)
+            ]);
+
         $platformMarket->tax();
 
         $value = satoshi_to_real($request->amount, $unit_price);

@@ -89,18 +89,37 @@ class PlatformMarketController extends Controller
 
         $ticker = HistoryTicker::last();
 
-        $unit_price = $ticker->platform_buy_price;
-
         $platformMarket = new PlatformMarket([
             'user_id' => Auth::id(),
             'type' => BUY,
             'amount' => $request->amount,
-            'unit_price' => $unit_price
+            'unit_price' => $ticker->platform_buy_price
         ]);
+
+        if (!$this->obeysMinimumPrice()) {
+
+            $settings = System::settings();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Valor mínimo deve ser maior ou igual a R$ '
+                    . number_format($settings->min_amount_buy, 2, ',', '.')
+            ]);
+        }
+
+        if (!$this->userHasBalance()) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Saldo insuficiente!'
+            ]);
+        }
 
         $platformMarket->tax();
 
         $platformMarket->setTickerEarning();
+
+        $platformMarket->updateUserBalance();
 
         $platformMarket->save();
 
@@ -118,18 +137,37 @@ class PlatformMarketController extends Controller
 
         $ticker = HistoryTicker::last();
 
-        $unit_price = $ticker->platform_sale_price;
-
         $platformMarket = new PlatformMarket([
             'user_id' => Auth::id(),
             'type' => SALE,
-            'amount' => $request->amount,
-            'unit_price' => $unit_price
+            'amount' => bitcoin_to_satoshi($request->amount),
+            'unit_price' => $ticker->platform_sale_price
         ]);
+
+        if (!$this->obeysMinimumPrice()) {
+
+            $settings = System::settings();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Altere a valor para que o total a receber seja maior ou igual a R$ '
+                    . number_format($settings->min_amount_sale, 2, ',', '.')
+            ]);
+        }
+
+        if (!$this->userHasBalance()) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Saldo insuficiente!'
+            ]);
+        }
 
         $platformMarket->tax();
 
         $platformMarket->setTickerEarning();
+
+        $platformMarket->updateUserBalance();
 
         $platformMarket->save();
 

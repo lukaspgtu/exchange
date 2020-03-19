@@ -66,7 +66,7 @@ class PlatformMarket extends Model
 
             $total_without_increase = real_to_satoshi($this->amount, $unit_price_without_increase) - $this->fee;
 
-            $total = $total_received - $total_without_increase;
+            $total = $total_without_increase - $total_received;
 
             $this->ticker_earning = satoshi_to_real($total, $unit_price_without_increase);
 
@@ -92,7 +92,7 @@ class PlatformMarket extends Model
 
             $user->balance_BRL -= $this->amount;
 
-            $user->balance_BTC += real_to_satoshi($this->amount, $this->unit_price);
+            $user->balance_BTC += real_to_satoshi($this->amount, $this->unit_price) - $this->fee;
 
         }
 
@@ -100,7 +100,7 @@ class PlatformMarket extends Model
 
             $user->balance_BTC -= $this->amount;
 
-            $user->balance_BRL += satoshi_to_real($this->amount, $this->unit_price);
+            $user->balance_BRL += satoshi_to_real($this->amount, $this->unit_price) - $this->fee;
 
         }
 

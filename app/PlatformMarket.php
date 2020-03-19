@@ -28,6 +28,12 @@ class PlatformMarket extends Model
 
             $value = bitcoin_to_real($this->amount, $this->unit_price);
 
+            return response()->json([
+                'value' => $value,
+                'sett' => $settings->platform_sale_fee,
+                'fee' => fee($value, $settings->platform_sale_fee)
+            ]);
+
             $this->fee = formatReal(fee($value, $settings->platform_sale_fee));
 
         }

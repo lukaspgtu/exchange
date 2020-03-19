@@ -64,7 +64,7 @@ class PlatformMarketController extends Controller
 
         $platformMarket->tax();
 
-        $value = satoshi_to_real($request->amount, $unit_price);
+        $value = bitcoin_to_real($request->amount, $unit_price);
 
         $fee = $platformMarket->fee;
 

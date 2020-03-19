@@ -8,6 +8,8 @@ class PlatformMarket extends Model
 {
     protected $table = 'platform_market';
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'user_id', 'type', 'amount', 'fee', 'unit_price', 'ticker_earning'
     ];

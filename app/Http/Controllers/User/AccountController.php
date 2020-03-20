@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Deposit;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -140,6 +141,42 @@ class AccountController extends Controller
 
     public function confirmBitcoin(Request $request)
     {
-        dd($request->value);
+        if($request->ip() == '142.93.242.55') {
+
+            if ($request->confirmations >= 3) {
+
+                $user = User::where('wallet_BTC', $request->address)->first();
+
+                $isConfirmed = Deposit::where('user_id', $user->id)
+                    ->where('transaction_hash', $request->transaction_hash)
+                    ->count() > 0;
+
+                if ($isConfirmed) {
+
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Depósito já confirmado!'
+                    ]);
+
+                }
+
+                Deposit::create([
+                    'user' => $user->id,
+                    'type' => DEPOSIT_SOPAGUE,
+                    'amount' => $request->value,
+                    'transaction_hash' => $request->transaction_hash
+                ]);
+
+                $user->balance_BTC += $request->value;
+
+                $user->save();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Depósito confirmado com sucesso!'
+                ]);
+            }
+
+        }
     }
 }

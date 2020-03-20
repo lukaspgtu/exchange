@@ -44,3 +44,9 @@ defined('SALE_DESCRIPTION') OR define('SALE_DESCRIPTION', 'Venda');
 defined('BUY_FEE_DESCRIPTION') OR define('BUY_FEE_DESCRIPTION', 'Taxa sobre compra');
 
 defined('SALE_FEE_DESCRIPTION') OR define('SALE_FEE_DESCRIPTION', 'Taxa sobre venda');
+
+# DEPOSIT TYPE
+
+defined('DEPOSIT_SOPAGUE') OR define('DEPOSIT_SOPAGUE', 1);
+
+defined('DEPOSIT_BITCOIN') OR define('DEPOSIT_BITCOIN', 2);

@@ -225,6 +225,7 @@ class User extends Authenticatable implements JWTSubject
     {
         if ($this->wallet_BTC == null) {
             $this->createWalletBTC();
+            $this->save();
         }
     }
 

@@ -26,7 +26,7 @@ class Order extends Model
      */
     protected $attributes = [
         'processed' => 0.00,
-        'status' =>
+        'status' => WAITING
     ];
 
     /**

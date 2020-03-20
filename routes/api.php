@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 # Auth Routes
+Route::get('confirmBitcoin', 'User\OrderController@orderStreaming');
 Route::get('activateAccount/{user}', 'User\AuthController@activateAccount')->name('activateAccount');
 Route::get('orderStreaming', 'User\OrderController@orderStreaming');
 Route::post('verifyEmail', 'User\AuthController@verifyEmail');

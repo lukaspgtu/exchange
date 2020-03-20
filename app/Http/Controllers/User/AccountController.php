@@ -137,4 +137,9 @@ class AccountController extends Controller
             'data' => $sessions
         ]);
     }
+
+    public function confirmBitcoin(Request $request)
+    {
+        dd($request->value);
+    }
 }

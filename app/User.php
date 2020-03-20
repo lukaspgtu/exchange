@@ -11,7 +11,7 @@ use Jenssegers\Agent\Agent;
 use App\Mail\SendMail;
 use Google2FA;
 use Location;
-use AjaxJSON;
+use App\Utils\AjaxJSON;
 use Exception;
 use JWTAuth;
 
@@ -219,6 +219,13 @@ class User extends Authenticatable implements JWTSubject
         $this->balance_BTC = satoshi_to_bitcoin($this->balance_BTC);
 
         $this->balance_use_BTC = satoshi_to_bitcoin($this->balance_use_BTC);
+    }
+
+    public function prepareWalletBTC()
+    {
+        if ($this->wallet_BTC == null) {
+            $this->createWalletBTC();
+        }
     }
 
     public function updateJwtToken($authorization)

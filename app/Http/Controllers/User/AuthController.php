@@ -378,21 +378,15 @@ class AuthController extends Controller
 
     public function auth()
     {
-        $columns = [
-            'id', 'name', 'document_number', 'document_date', 'email', 'account_type', 'balance_BTC', 'balance_use_BTC', 'balance_BRL', 'balance_use_BRL', 'wallet_BTC', 'twofactor_status', 'email_status'
-        ];
-
-        $user = User::select($columns)
-            ->where('id', Auth::id())
-            ->first();
+        $user = User::find(Auth::id());
 
         $user->prepareBalances();
 
+        $user->prepareWalletBTC();
+
         return response()->json([
             'success' => true,
-            'data' => [
-                'user' => $user
-            ]
+            'data' => $user
         ]);
     }
 }

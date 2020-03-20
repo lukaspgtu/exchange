@@ -36,7 +36,7 @@ Route::group(['middleware' => 'assign.guard:users'], function () {
 
         # Account Routes
         Route::get('operationalLimits', 'User\AccountController@operationalLimits');
-        Route::get('sessions', 'User\AccountController@sessions');
+        Route::get('operationalLimits', 'User\AccountController@operationalLimits');
         Route::put('updateEmail', 'User\AccountController@updateEmail');
         Route::put('updatePassword', 'User\AccountController@updatePassword');
 
